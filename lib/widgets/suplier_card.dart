@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:monitoring_mobile/theme.dart';
 
+// ignore_for_file: must_be_immutable
 class SuplierCard extends StatelessWidget {
   String namaSupllier;
   Color namaSupllierColor;
