@@ -37,7 +37,7 @@ class PortalPage extends StatelessWidget {
               const SizedBox(
                 height: 30,
               ),
-              ListSuplier(),
+              const ListSuplier(),
             ],
           ),
         ));
