@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+
 import 'package:monitoring_mobile/pages/get_started_page.dart';
 import 'package:monitoring_mobile/pages/login_page.dart';
 import 'package:monitoring_mobile/pages/portal_page.dart';
+import 'package:monitoring_mobile/splashscreen.dart';
 
 import 'pages/details/dummy.dart';
 import 'pages/home_page.dart';
+
 
 void main() {
   runApp(const MyApp());
