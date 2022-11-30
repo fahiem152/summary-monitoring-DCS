@@ -8,7 +8,6 @@ import 'package:monitoring_mobile/splashscreen.dart';
 import 'pages/details/dummy.dart';
 import 'pages/home_page.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -20,8 +19,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const GetStartedPage(),
+      home: const SplashScreen(),
       routes: {
+        '/splashscreen': (context) => const SplashScreen(),
         '/login': (context) => const LoginPage(),
         '/get-started': (context) => const GetStartedPage(),
         '/portal': (context) => const PortalPage(),
