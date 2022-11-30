@@ -278,6 +278,8 @@ class _LoginPageState extends State<LoginPage> {
                                 value: roles,
                                 onChanged: (value) {
                                   setState(() {
+                                    print(value);
+
                                     roles = value as String;
                                   });
                                 },
@@ -291,12 +293,13 @@ class _LoginPageState extends State<LoginPage> {
                         ButtonCustom(
                           title: 'Login',
                           press: () {
-                            // if (roles!.isEmpty) {
-                            //   Navigator.pop(context);
-                            //   ScaffoldMessenger.of(context).showSnackBar(
-                            //       SnackBar(content: Text('Wajib disi')));
-                            // }
-                            check();
+                            if (roles == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Role Is Required')));
+                            } else {
+                              check();
+                            }
                           },
                         ),
                       ],

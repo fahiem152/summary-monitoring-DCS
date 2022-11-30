@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:monitoring_mobile/home.dart';
+import 'package:monitoring_mobile/pages/home_page.dart';
+
+import 'helper/user_info.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -13,8 +15,23 @@ class _SplashScreen extends State<SplashScreen> {
   splashscreenStart() async {
     var duration = const Duration(seconds: 3);
     return Timer(duration, () {
-      Navigator.pushNamed(context, '/get-started');
+      // Navigator.pushNamed(context, '/get-started');
+      setState(() {
+        loadUserInfo();
+      });
     });
+  }
+
+  void loadUserInfo() async {
+    await Future.delayed(const Duration(milliseconds: 1000));
+    String token = await getToken();
+    if (token == '') {  
+      Navigator.pushNamed(context, '/get-started');
+    } else {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const HomePage()),
+          (route) => false);
+    }
   }
 
   @override
