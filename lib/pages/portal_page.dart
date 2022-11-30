@@ -35,48 +35,58 @@ class PortalPage extends StatelessWidget {
                     descriptionSupllier:
                         'One of the best auto parts manufacturers in the world.',
                     logoSupllier: 'assets/images/toyota.png',
+                    press: () {
+                      Navigator.pushNamed(context, '/login');
+                    },
                   ),
                   SuplierCard(
                     namaSupllier: 'Asana',
                     descriptionSupllier:
                         'Asana powers businesses by organizing work in one connected space.',
                     logoSupllier: 'assets/images/asana.png',
+                    press: () {},
                   ),
                   SuplierCard(
                     namaSupllier: 'Mitsubishi Motors',
                     descriptionSupllier:
                         'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
                     logoSupllier: 'assets/images/mitsubishi.png',
+                    press: () {},
                   ),
                   SuplierCard(
                     namaSupllier: 'Ferrari',
                     descriptionSupllier:
                         'Ferrari is a manufacturer of high-performance Italian super cars and racing cars based in  Maranello, Italy.',
                     logoSupllier: 'assets/images/ferrai.png',
+                    press: () {},
                   ),
                   SuplierCard(
                     namaSupllier: 'Lamborghini',
                     descriptionSupllier:
                         'Automobili Lamborghini S.p.A. is an Italian brand and manufacturer of luxury sports cars.',
                     logoSupllier: 'assets/images/lamborghini.png',
+                    press: () {},
                   ),
                   SuplierCard(
                     namaSupllier: 'Mitsubishi Motors',
                     descriptionSupllier:
                         'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
                     logoSupllier: 'assets/images/mitsubishi.png',
+                    press: () {},
                   ),
                   SuplierCard(
                     namaSupllier: 'Asana',
                     descriptionSupllier:
                         'Asana powers businesses by organizing work in one connected space.',
                     logoSupllier: 'assets/images/asana.png',
+                    press: () {},
                   ),
                   SuplierCard(
                     namaSupllier: 'Mitsubishi Motors',
                     descriptionSupllier:
                         'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
                     logoSupllier: 'assets/images/mitsubishi.png',
+                    press: () {},
                   ),
                 ],
               ),

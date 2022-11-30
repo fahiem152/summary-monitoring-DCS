@@ -64,8 +64,10 @@ class _GetStartedPageState extends State<GetStartedPage> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ButtonCustom(
-                  title: 'Login',
-                  press: () {},
+                  title: 'Get Started',
+                  press: () {
+                    Navigator.pushNamed(context, '/portal');
+                  },
                 ),
               ),
             ],

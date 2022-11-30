@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:monitoring_mobile/helper/user_info.dart';
 import 'package:monitoring_mobile/list/list_body_home.dart';
+import 'package:monitoring_mobile/pages/get_started_page.dart';
 import 'package:monitoring_mobile/theme.dart';
 import 'package:monitoring_mobile/widgets/dashline.dart';
 import 'package:monitoring_mobile/widgets/home_card.dart';
@@ -52,7 +54,12 @@ class HomePage extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushNamed(context, '/portal');
+                        logout().then((value) => Navigator.of(context)
+                            .pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const GetStartedPage()),
+                                (route) => false));
                       },
                       child: Image.asset(
                         "assets/images/btn_logout.png",

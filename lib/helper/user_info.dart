@@ -1,5 +1,11 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+//get token
+Future<String> getToken() async {
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  return preferences.getString('token') ?? '';
+}
+
 //get role
 Future<String> getrole() async {
   SharedPreferences preferences = await SharedPreferences.getInstance();

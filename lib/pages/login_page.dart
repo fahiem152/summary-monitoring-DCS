@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:monitoring_mobile/models/api_response_model.dart';
+import 'package:monitoring_mobile/models/user_model.dart';
+import 'package:monitoring_mobile/pages/home_page.dart';
+import 'package:monitoring_mobile/services/auth_service.dart';
 import 'package:monitoring_mobile/theme.dart';
 import 'package:monitoring_mobile/widgets/button_default.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -11,7 +16,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _key = GlobalKey<FormState>();
-  TextEditingController textNIS = TextEditingController();
+  TextEditingController textNis = TextEditingController();
   TextEditingController textPassword = TextEditingController();
 
   bool _secureText = true;
@@ -21,6 +26,28 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
+  showAlertDialog(BuildContext context) {
+    AlertDialog alert = AlertDialog(
+      content: Row(
+        children: [
+          const CircularProgressIndicator(
+            color: Colors.blueAccent,
+          ),
+          Container(
+              margin: const EdgeInsets.only(left: 5),
+              child: const Text("Loading")),
+        ],
+      ),
+    );
+    showDialog(
+      barrierDismissible: false,
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
+  }
+
   final List<String> items = [
     'Admin Material',
     'Admin Finish Good',
@@ -28,6 +55,41 @@ class _LoginPageState extends State<LoginPage> {
   ];
 
   String? roles;
+
+  void functionLoginUser() async {
+    showAlertDialog(context);
+    ApiResponse response =
+        await login(username: textNis.text, password: textPassword.text);
+
+    if (response.error == null) {
+      saveAndRedirectToHome(response.data as UserModel);
+      Navigator.pop(context);
+    } else {
+      Navigator.pop(context);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('${response.error}')));
+    }
+  }
+
+  void saveAndRedirectToHome(UserModel userModel) async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    await preferences.setString('token', userModel.token);
+    await preferences.setString('role', roles.toString());
+    await preferences.setString('email', userModel.email);
+
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const HomePage()),
+        (route) => false);
+  }
+
+  check() {
+    final form = _key.currentState!;
+    if (form.validate()) {
+      form.save();
+      functionLoginUser();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,6 +173,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 10),
                             child: TextFormField(
+                              controller: textNis,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
                                 hintText: 'Enter Your NIS',
@@ -141,6 +204,7 @@ class _LoginPageState extends State<LoginPage> {
                           child: Padding(
                             padding: const EdgeInsets.only(left: 10),
                             child: TextFormField(
+                              controller: textPassword,
                               obscureText: _secureText,
                               decoration: InputDecoration(
                                 border: InputBorder.none,
@@ -160,7 +224,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 10,
                         ),
                         Text(
-                          'Password',
+                          'Select Role',
                           style: textOpenSans.copyWith(
                             color: black2Color,
                             fontSize: 12,
@@ -226,7 +290,14 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         ButtonCustom(
                           title: 'Login',
-                          press: () {},
+                          press: () {
+                            // if (roles!.isEmpty) {
+                            //   Navigator.pop(context);
+                            //   ScaffoldMessenger.of(context).showSnackBar(
+                            //       SnackBar(content: Text('Wajib disi')));
+                            // }
+                            check();
+                          },
                         ),
                       ],
                     ),
