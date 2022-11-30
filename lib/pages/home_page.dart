@@ -3,11 +3,32 @@ import 'package:monitoring_mobile/helper/user_info.dart';
 import 'package:monitoring_mobile/list/list_body_home.dart';
 import 'package:monitoring_mobile/pages/get_started_page.dart';
 import 'package:monitoring_mobile/theme.dart';
-import 'package:monitoring_mobile/widgets/dashline.dart';
 import 'package:monitoring_mobile/widgets/home_card.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String role = '';
+
+  getPref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      role = preferences.getString("role")!;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getPref();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +64,7 @@ class HomePage extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "Manager / BOD",
+                            role == '' ? 'Waiting' : role,
                             style: blackTextStyle.copyWith(
                               fontWeight: regular,
                               fontSize: 14,
@@ -54,12 +75,38 @@ class HomePage extends StatelessWidget {
                     ),
                     GestureDetector(
                       onTap: () {
-                        logout().then((value) => Navigator.of(context)
-                            .pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const GetStartedPage()),
-                                (route) => false));
+                        Alert(
+                          context: context,
+                          type: AlertType.warning,
+                          title: "DCS Production",
+                          desc: "Do you want logout ?",
+                          buttons: [
+                            DialogButton(
+                              child: const Text(
+                                "Cencel",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              width: 120,
+                            ),
+                            DialogButton(
+                              color: Colors.red,
+                              child: const Text(
+                                "Yes",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              onPressed: () => logout().then((value) =>
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const GetStartedPage()),
+                                      (route) => false)),
+                              width: 120,
+                            )
+                          ],
+                        ).show();
                       },
                       child: Image.asset(
                         "assets/images/btn_logout.png",
