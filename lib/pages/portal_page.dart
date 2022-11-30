@@ -9,11 +9,11 @@ class PortalPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: backgrounColor1,
-        body: Padding(
-          padding: const EdgeInsets.all(30),
-          child: ListView(
-            children: [
-              Text(
+        body: ListView(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+              child: Text(
                 'Select Supplier',
                 style: textOpenSans.copyWith(
                   color: blackColor,
@@ -22,59 +22,66 @@ class PortalPage extends StatelessWidget {
                   letterSpacing: 1,
                 ),
               ),
-              const SizedBox(
-                height: 10,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  SuplierCard(
+                    namaSupllier: 'Toyota',
+                    descriptionSupllier:
+                        'One of the best auto parts manufacturers in the world.',
+                    logoSupllier: 'assets/images/toyota.png',
+                  ),
+                  SuplierCard(
+                    namaSupllier: 'Asana',
+                    descriptionSupllier:
+                        'Asana powers businesses by organizing work in one connected space.',
+                    logoSupllier: 'assets/images/asana.png',
+                  ),
+                  SuplierCard(
+                    namaSupllier: 'Mitsubishi Motors',
+                    descriptionSupllier:
+                        'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
+                    logoSupllier: 'assets/images/mitsubishi.png',
+                  ),
+                  SuplierCard(
+                    namaSupllier: 'Ferrari',
+                    descriptionSupllier:
+                        'Ferrari is a manufacturer of high-performance Italian super cars and racing cars based in  Maranello, Italy.',
+                    logoSupllier: 'assets/images/ferrai.png',
+                  ),
+                  SuplierCard(
+                    namaSupllier: 'Lamborghini',
+                    descriptionSupllier:
+                        'Automobili Lamborghini S.p.A. is an Italian brand and manufacturer of luxury sports cars.',
+                    logoSupllier: 'assets/images/lamborghini.png',
+                  ),
+                  SuplierCard(
+                    namaSupllier: 'Mitsubishi Motors',
+                    descriptionSupllier:
+                        'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
+                    logoSupllier: 'assets/images/mitsubishi.png',
+                  ),
+                  SuplierCard(
+                    namaSupllier: 'Asana',
+                    descriptionSupllier:
+                        'Asana powers businesses by organizing work in one connected space.',
+                    logoSupllier: 'assets/images/asana.png',
+                  ),
+                  SuplierCard(
+                    namaSupllier: 'Mitsubishi Motors',
+                    descriptionSupllier:
+                        'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
+                    logoSupllier: 'assets/images/mitsubishi.png',
+                  ),
+                ],
               ),
-              SuplierCard(
-                namaSupllier: 'Toyota',
-                descriptionSupllier:
-                    'One of the best auto parts manufacturers in the world.',
-                logoSupllier: 'assets/images/toyota.png',
-              ),
-              SuplierCard(
-                namaSupllier: 'Asana',
-                descriptionSupllier:
-                    'Asana powers businesses by organizing work in one connected space.',
-                logoSupllier: 'assets/images/asana.png',
-              ),
-              SuplierCard(
-                namaSupllier: 'Mitsubishi Motors',
-                descriptionSupllier:
-                    'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
-                logoSupllier: 'assets/images/mitsubishi.png',
-              ),
-              SuplierCard(
-                namaSupllier: 'Ferrari',
-                descriptionSupllier:
-                    'Ferrari is a manufacturer of high-performance Italian super cars and racing cars based in  Maranello, Italy.',
-                logoSupllier: 'assets/images/ferrai.png',
-              ),
-              SuplierCard(
-                namaSupllier: 'Lamborghini',
-                descriptionSupllier:
-                    'Automobili Lamborghini S.p.A. is an Italian brand and manufacturer of luxury sports cars.',
-                logoSupllier: 'assets/images/lamborghini.png',
-              ),
-              SuplierCard(
-                namaSupllier: 'Mitsubishi Motors',
-                descriptionSupllier:
-                    'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
-                logoSupllier: 'assets/images/mitsubishi.png',
-              ),
-              SuplierCard(
-                namaSupllier: 'Asana',
-                descriptionSupllier:
-                    'Asana powers businesses by organizing work in one connected space.',
-                logoSupllier: 'assets/images/asana.png',
-              ),
-              SuplierCard(
-                namaSupllier: 'Mitsubishi Motors',
-                descriptionSupllier:
-                    'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
-                logoSupllier: 'assets/images/mitsubishi.png',
-              ),
-            ],
-          ),
+            )
+          ],
         ));
   }
 }

@@ -28,7 +28,6 @@ class SuplierCard extends StatelessWidget {
           padding: const EdgeInsets.all(
             12,
           ),
-          height: 75,
           child: Row(
             children: [
               Image.asset(
