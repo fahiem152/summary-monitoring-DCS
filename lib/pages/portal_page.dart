@@ -14,90 +14,67 @@ class PortalPage extends StatelessWidget {
           child: ListView(
             children: [
               Text(
-                'DCS Production Wharehouse & Delivery',
+                'Select Supplier',
                 style: textOpenSans.copyWith(
                   color: blackColor,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
                   letterSpacing: 1,
                 ),
               ),
               const SizedBox(
-                height: 30,
+                height: 10,
               ),
-              Text(
-                'Suplier',
-                style: textOpenSans.copyWith(
-                  color: blackColor,
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 1,
-                ),
+              SuplierCard(
+                namaSupllier: 'Toyota',
+                descriptionSupllier:
+                    'One of the best auto parts manufacturers in the world.',
+                logoSupllier: 'assets/images/toyota.png',
               ),
-              const SizedBox(
-                height: 30,
+              SuplierCard(
+                namaSupllier: 'Asana',
+                descriptionSupllier:
+                    'Asana powers businesses by organizing work in one connected space.',
+                logoSupllier: 'assets/images/asana.png',
               ),
-              const ListSuplier(),
+              SuplierCard(
+                namaSupllier: 'Mitsubishi Motors',
+                descriptionSupllier:
+                    'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
+                logoSupllier: 'assets/images/mitsubishi.png',
+              ),
+              SuplierCard(
+                namaSupllier: 'Ferrari',
+                descriptionSupllier:
+                    'Ferrari is a manufacturer of high-performance Italian super cars and racing cars based in  Maranello, Italy.',
+                logoSupllier: 'assets/images/ferrai.png',
+              ),
+              SuplierCard(
+                namaSupllier: 'Lamborghini',
+                descriptionSupllier:
+                    'Automobili Lamborghini S.p.A. is an Italian brand and manufacturer of luxury sports cars.',
+                logoSupllier: 'assets/images/lamborghini.png',
+              ),
+              SuplierCard(
+                namaSupllier: 'Mitsubishi Motors',
+                descriptionSupllier:
+                    'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
+                logoSupllier: 'assets/images/mitsubishi.png',
+              ),
+              SuplierCard(
+                namaSupllier: 'Asana',
+                descriptionSupllier:
+                    'Asana powers businesses by organizing work in one connected space.',
+                logoSupllier: 'assets/images/asana.png',
+              ),
+              SuplierCard(
+                namaSupllier: 'Mitsubishi Motors',
+                descriptionSupllier:
+                    'Mitsubishi Motors is the sixth largest automotive manufacturer by volume in Japan.',
+                logoSupllier: 'assets/images/mitsubishi.png',
+              ),
             ],
           ),
         ));
-  }
-}
-
-class ListSuplier extends StatelessWidget {
-  const ListSuplier({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GridView.count(
-      scrollDirection: Axis.vertical,
-      shrinkWrap: true,
-      crossAxisCount: 2,
-      childAspectRatio: 3 / 1,
-      crossAxisSpacing: 30,
-      mainAxisSpacing: 60,
-      children: [
-        SuplierCard(
-          namaSupllier: 'Suplier A',
-          backgroundSupplier: weightPrimaryColor,
-          namaSupllierColor: black2Color,
-        ),
-        SuplierCard(
-          namaSupllier: 'Suplier B',
-          backgroundSupplier: weightPrimaryColor,
-          namaSupllierColor: black2Color,
-        ),
-        SuplierCard(
-          namaSupllier: 'Suplier C',
-          backgroundSupplier: successColor,
-          namaSupllierColor: black2Color,
-        ),
-        SuplierCard(
-          namaSupllier: 'Suplier D',
-          backgroundSupplier: successColor,
-          namaSupllierColor: black2Color,
-        ),
-        SuplierCard(
-          namaSupllier: 'Suplier E',
-          backgroundSupplier: primaryColor,
-          namaSupllierColor: whiteColor,
-        ),
-        SuplierCard(
-          namaSupllier: 'Suplier F',
-          backgroundSupplier: primaryColor,
-          namaSupllierColor: whiteColor,
-        ),
-        SuplierCard(
-          namaSupllier: 'Suplier G',
-          backgroundSupplier: blackColor,
-          namaSupllierColor: whiteColor,
-        ),
-        SuplierCard(
-          namaSupllier: 'Suplier H',
-          backgroundSupplier: blackColor,
-          namaSupllierColor: whiteColor,
-        ),
-      ],
-    );
   }
 }

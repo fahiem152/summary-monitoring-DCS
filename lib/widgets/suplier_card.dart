@@ -4,41 +4,71 @@ import 'package:monitoring_mobile/theme.dart';
 // ignore_for_file: must_be_immutable
 class SuplierCard extends StatelessWidget {
   String namaSupllier;
-  Color namaSupllierColor;
-  Color backgroundSupplier;
+  String descriptionSupllier;
+  String logoSupllier;
   SuplierCard({
     Key? key,
     required this.namaSupllier,
-    required this.backgroundSupplier,
-    required this.namaSupllierColor,
+    required this.descriptionSupllier,
+    required this.logoSupllier,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: backgroundSupplier,
-        borderRadius: BorderRadius.circular(
-          10,
-        ),
+    return Padding(
+      padding: const EdgeInsets.only(
+        bottom: 10,
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Image.asset(
-            'assets/images/python.png',
-            width: 20,
-            height: 20,
+      child: Card(
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(
+          15,
+        )),
+        color: whiteColor,
+        child: Container(
+          padding: const EdgeInsets.all(
+            12,
           ),
-          Text(
-            namaSupllier,
-            style: textOpenSans.copyWith(
-              color: namaSupllierColor,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 1,
-            ),
+          height: 75,
+          child: Row(
+            children: [
+              Image.asset(
+                logoSupllier,
+                width: 44,
+                height: 49,
+              ),
+              const SizedBox(
+                width: 16,
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      namaSupllier,
+                      style: textOpenSans.copyWith(
+                        color: blackColor,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 1,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 6,
+                    ),
+                    Text(
+                      descriptionSupllier,
+                      style: textOpenSans.copyWith(
+                        color: blackColor,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
+                ),
+              )
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
