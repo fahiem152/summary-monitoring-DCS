@@ -25,7 +25,7 @@ class _SplashScreen extends State<SplashScreen> {
   void loadUserInfo() async {
     await Future.delayed(const Duration(milliseconds: 1000));
     String token = await getToken();
-    if (token == '') {  
+    if (token == '') {
       Navigator.pushNamed(context, '/get-started');
     } else {
       Navigator.of(context).pushAndRemoveUntil(

@@ -16,11 +16,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String role = '';
+  String firstName = '';
+  String lastName = '';
 
   getPref() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
       role = preferences.getString("role")!;
+      firstName = preferences.getString("firstName")!;
+      lastName = preferences.getString("lastName")!;
     });
   }
 
@@ -57,7 +61,9 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Mitsubishi Motors",
+                            firstName == ''
+                                ? 'Waiting'
+                                : firstName + ' ' + lastName,
                             style: blackTextStyle.copyWith(
                               fontWeight: semiBold,
                               fontSize: 24,
@@ -72,6 +78,9 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ],
                       ),
+                    ),
+                    const SizedBox(
+                      width: 10,
                     ),
                     GestureDetector(
                       onTap: () {
@@ -139,7 +148,10 @@ class _HomePageState extends State<HomePage> {
               ),
               itemBuilder: (context, index) => BodyHome(
                 tap: () {
-                  Navigator.pushNamed(context, '/detail-home');
+                  // if (listBodyHome[index] == 0) {
+                  //   print('Monitoring Stock');
+                  // }
+                  Navigator.pushNamed(context, '/detail-stock-fg');
                 },
                 listBodyHome: listBodyHome[index],
               ),
