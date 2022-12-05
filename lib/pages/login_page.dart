@@ -76,6 +76,8 @@ class _LoginPageState extends State<LoginPage> {
     await preferences.setString('token', userModel.token);
     await preferences.setString('role', roles.toString());
     await preferences.setString('email', userModel.email);
+    await preferences.setString('firstName', userModel.firstName);
+    await preferences.setString('lastName', userModel.lastName);
 
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const HomePage()),

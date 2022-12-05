@@ -3,4 +3,4 @@ const unauthorized = 'unauthorized';
 const somethingWhentWrong = 'somethingWhentWrong';
 
 //Example
-const baseURL = 'http://192.168.1.10:8080';
+const baseURL = 'https://638af90181df38ab345ea7a1.mockapi.io';
