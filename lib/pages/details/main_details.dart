@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:monitoring_mobile/models/homepage_tile.dart';
+import 'package:monitoring_mobile/pages/details/msm.dart';
 import 'package:monitoring_mobile/theme.dart';
 
 import 'mivo.dart';
 import 'pfgivo.dart';
+import 'sdpa.dart';
+import 'sngp.dart';
+import 'stock_fg.dart';
 
 class DetailHomePage extends StatefulWidget {
   final ListBodyHome listBodyHome;
@@ -44,9 +48,12 @@ class _DetailHomePageState extends State<DetailHomePage> {
     return IndexedStack(
       index: widget.index,
       children: const [
-        // Production Finish Good In Vs Out
+        MonitoringSM(),
+        StockFG(),
         ProdFGInVSOut(),
         MaterialInVSOut(),
+        SumNGPart(),
+        SumDailyProdAchiev(),
       ],
     );
   }

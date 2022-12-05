@@ -18,6 +18,18 @@ Future<String> getEmail() async {
   return preferences.getString('email') ?? '';
 }
 
+//get firstName
+Future<String> getFirstName() async {
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  return preferences.getString('firstName') ?? '';
+}
+
+//get lastName
+Future<String> getLastName() async {
+  SharedPreferences preferences = await SharedPreferences.getInstance();
+  return preferences.getString('lastName') ?? '';
+}
+
 //logout
 Future<bool> logout() async {
   SharedPreferences preferences = await SharedPreferences.getInstance();
