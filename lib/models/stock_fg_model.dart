@@ -13,7 +13,7 @@ class StockFGModel {
 
   String name;
   int value;
-  int id;
+  String id;
 
   factory StockFGModel.fromJson(Map<String, dynamic> json) => StockFGModel(
         name: json["name"],

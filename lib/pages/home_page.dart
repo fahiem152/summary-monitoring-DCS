@@ -7,6 +7,8 @@ import 'package:monitoring_mobile/widgets/home_card.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'details/main_details.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -106,12 +108,14 @@ class _HomePageState extends State<HomePage> {
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
-                              onPressed: () => logout().then((value) =>
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const GetStartedPage()),
-                                      (route) => false)),
+                              onPressed: () => logout().then(
+                                (value) => Navigator.of(context)
+                                    .pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const GetStartedPage()),
+                                        (route) => false),
+                              ),
                               width: 120,
                             )
                           ],
@@ -148,10 +152,16 @@ class _HomePageState extends State<HomePage> {
               ),
               itemBuilder: (context, index) => BodyHome(
                 tap: () {
-                  // if (listBodyHome[index] == 0) {
-                  //   print('Monitoring Stock');
-                  // }
-                  Navigator.pushNamed(context, '/detail-stock-fg');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailHomePage(
+                        listBodyHome: listBodyHome[index],
+                        index: index,
+                      ),
+                    ),
+                  );
+                  print(index);
                 },
                 listBodyHome: listBodyHome[index],
               ),
