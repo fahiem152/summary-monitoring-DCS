@@ -76,6 +76,8 @@ class _LoginPageState extends State<LoginPage> {
     await preferences.setString('token', userModel.token);
     await preferences.setString('role', roles.toString());
     await preferences.setString('email', userModel.email);
+    await preferences.setString('firstName', userModel.firstName);
+    await preferences.setString('lastName', userModel.lastName);
 
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (context) => const HomePage()),
@@ -96,7 +98,8 @@ class _LoginPageState extends State<LoginPage> {
       backgroundColor: backgrounColor1,
       body: SingleChildScrollView(
         child: Padding(
-          padding: const EdgeInsets.only(top: 60, left: 10, right: 10),
+          padding:
+              const EdgeInsets.only(top: 40, left: 24, right: 24, bottom: 24),
           child: Form(
             key: _key,
             child: Column(
@@ -108,7 +111,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: textOpenSans.copyWith(
                       color: blackColor,
                       fontSize: 24,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: extraBold,
                       letterSpacing: 1,
                     ),
                   ),
@@ -117,19 +120,19 @@ class _LoginPageState extends State<LoginPage> {
                   child: Text(
                     'Warehouse & Delivery',
                     style: textOpenSans.copyWith(
-                      color: black2Color,
+                      color: blackColor.withOpacity(0.6),
                       fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: semiBold,
                       letterSpacing: 1,
                     ),
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.only(top: 50, bottom: 50),
+                  padding: const EdgeInsets.only(top: 30, bottom: 30),
                   child: Center(
                     child: SizedBox(
                       height: 150,
-                      child: Image.asset('assets/images/logo-vector.png'),
+                      child: Image.asset('assets/images/logo.png'),
                     ),
                   ),
                 ),
@@ -154,7 +157,7 @@ class _LoginPageState extends State<LoginPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'NIS',
+                          'NISP',
                           style: textOpenSans.copyWith(
                             color: black2Color,
                             fontSize: 12,
@@ -165,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 10,
                         ),
                         Container(
-                          height: 48,
+                          height: 45,
                           decoration: BoxDecoration(
                               border:
                                   Border.all(color: primaryColor, width: 1.0),
@@ -176,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                               controller: textNis,
                               decoration: const InputDecoration(
                                 border: InputBorder.none,
-                                hintText: 'Enter Your NIS',
+                                hintText: 'Enter Your NISP',
                               ),
                             ),
                           ),
@@ -196,7 +199,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 10,
                         ),
                         Container(
-                          height: 48,
+                          height: 45,
                           decoration: BoxDecoration(
                               border:
                                   Border.all(color: primaryColor, width: 1.0),
@@ -235,7 +238,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 10,
                         ),
                         Container(
-                          height: 48,
+                          height: 45,
                           width: double.infinity,
                           decoration: BoxDecoration(
                               border:
@@ -278,6 +281,8 @@ class _LoginPageState extends State<LoginPage> {
                                 value: roles,
                                 onChanged: (value) {
                                   setState(() {
+                                    print(value);
+
                                     roles = value as String;
                                   });
                                 },
@@ -286,17 +291,18 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                         const SizedBox(
-                          height: 40,
+                          height: 24,
                         ),
                         ButtonCustom(
                           title: 'Login',
                           press: () {
-                            // if (roles!.isEmpty) {
-                            //   Navigator.pop(context);
-                            //   ScaffoldMessenger.of(context).showSnackBar(
-                            //       SnackBar(content: Text('Wajib disi')));
-                            // }
-                            check();
+                            if (roles == null) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('Role Is Required')));
+                            } else {
+                              check();
+                            }
                           },
                         ),
                       ],

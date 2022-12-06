@@ -3,11 +3,38 @@ import 'package:monitoring_mobile/helper/user_info.dart';
 import 'package:monitoring_mobile/list/list_body_home.dart';
 import 'package:monitoring_mobile/pages/get_started_page.dart';
 import 'package:monitoring_mobile/theme.dart';
-import 'package:monitoring_mobile/widgets/dashline.dart';
 import 'package:monitoring_mobile/widgets/home_card.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatelessWidget {
+import 'details/main_details.dart';
+
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  String role = '';
+  String firstName = '';
+  String lastName = '';
+
+  getPref() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    setState(() {
+      role = preferences.getString("role")!;
+      firstName = preferences.getString("firstName")!;
+      lastName = preferences.getString("lastName")!;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getPref();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,14 +63,16 @@ class HomePage extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Mitsubishi Motors",
+                            firstName == ''
+                                ? 'Waiting'
+                                : firstName + ' ' + lastName,
                             style: blackTextStyle.copyWith(
                               fontWeight: semiBold,
                               fontSize: 24,
                             ),
                           ),
                           Text(
-                            "Manager / BOD",
+                            role == '' ? 'Waiting' : role,
                             style: blackTextStyle.copyWith(
                               fontWeight: regular,
                               fontSize: 14,
@@ -52,14 +81,45 @@ class HomePage extends StatelessWidget {
                         ],
                       ),
                     ),
+                    const SizedBox(
+                      width: 10,
+                    ),
                     GestureDetector(
                       onTap: () {
-                        logout().then((value) => Navigator.of(context)
-                            .pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const GetStartedPage()),
-                                (route) => false));
+                        Alert(
+                          context: context,
+                          type: AlertType.warning,
+                          title: "DCS Production",
+                          desc: "Do you want logout ?",
+                          buttons: [
+                            DialogButton(
+                              child: const Text(
+                                "Cencel",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              onPressed: () => Navigator.pop(context),
+                              width: 120,
+                            ),
+                            DialogButton(
+                              color: Colors.red,
+                              child: const Text(
+                                "Yes",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              onPressed: () => logout().then(
+                                (value) => Navigator.of(context)
+                                    .pushAndRemoveUntil(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const GetStartedPage()),
+                                        (route) => false),
+                              ),
+                              width: 120,
+                            )
+                          ],
+                        ).show();
                       },
                       child: Image.asset(
                         "assets/images/btn_logout.png",
@@ -92,7 +152,16 @@ class HomePage extends StatelessWidget {
               ),
               itemBuilder: (context, index) => BodyHome(
                 tap: () {
-                  Navigator.pushNamed(context, '/detail-home');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailHomePage(
+                        listBodyHome: listBodyHome[index],
+                        index: index,
+                      ),
+                    ),
+                  );
+                  print(index);
                 },
                 listBodyHome: listBodyHome[index],
               ),
