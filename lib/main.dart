@@ -5,7 +5,7 @@ import 'package:monitoring_mobile/pages/login_page.dart';
 import 'package:monitoring_mobile/pages/portal_page.dart';
 import 'package:monitoring_mobile/splashscreen.dart';
 
-import 'pages/details/dummy.dart';
+
 import 'pages/home_page.dart';
 
 void main() {
@@ -26,7 +26,8 @@ class MyApp extends StatelessWidget {
         '/get-started': (context) => const GetStartedPage(),
         '/portal': (context) => const PortalPage(),
         '/home': (context) => const HomePage(),
-        '/detail-home': (context) => const DetailHomePage(),
+        // '/detail-home': (context) => const DetailHomePage(),
+
       },
     );
   }
