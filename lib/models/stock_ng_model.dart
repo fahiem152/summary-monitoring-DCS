@@ -37,6 +37,10 @@ class StockNGModel {
         0, (previousValue, element) => previousValue + element.value);
   }
 
+  // int getTotalAllQuantityNG() {
+  //   return scrab_ng.fold(
+  //       0, (previousValue, element) => previousValue + element.value);
+  // }
   // int getTotalQuantityNG(int allQuantity) {
   //   return allQuantity += getQuantityNG();
   // }

@@ -6,6 +6,7 @@ import 'package:monitoring_mobile/models/stock_ng_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:monitoring_mobile/theme.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:intl/intl.dart';
 
 class SumNGPart extends StatefulWidget {
   const SumNGPart({Key? key}) : super(key: key);
@@ -16,10 +17,9 @@ class SumNGPart extends StatefulWidget {
 
 class _SumNGPartState extends State<SumNGPart> {
   List<StockNGModel> stock = [];
-  // List<ScrabNGModel> scrap = [];
-
-  // late int quantityNG;
-  // late StockNGModel stockNG;
+  TextEditingController tanggal = TextEditingController();
+  final String datenow = DateFormat('yyyy-MM-dd').format(DateTime.now());
+  List<Color> colors = [blueColor, purpleColor, pinkColor];
   bool loading = true;
   void getDataNG() async {
     var response = await http.get(
@@ -29,41 +29,27 @@ class _SumNGPartState extends State<SumNGPart> {
     );
     List dataStock = json.decode(response.body);
     print(json.decode(response.body));
-
-    // List dataScrap = json.decode(response.body);
-    // print(json.decode(response.body)['scrab_ng']);
-
     setState(() {
       stock = stockModelNGFromJson(dataStock);
-      // scrap = scrabModelNGFromJson(dataScrap);
-
       loading = false;
     });
   }
 
   List<ChartSeries<StockNGModel, String>> _dataChart() {
-    return [
-      StackedColumnSeries<StockNGModel, String>(
+    return stock.map((e) {
+      return StackedColumnSeries<StockNGModel, String>(
         dataSource: stock,
+        color: colors[stock.indexOf(e)],
         xValueMapper: (StockNGModel ch, _) => ch.material,
-        yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[0].value,
-      ),
-      StackedColumnSeries<StockNGModel, String>(
-        dataSource: stock,
-        xValueMapper: (StockNGModel ch, _) => ch.material,
-        yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[1].value,
-      ),
-      StackedColumnSeries<StockNGModel, String>(
-        dataSource: stock,
-        xValueMapper: (StockNGModel ch, _) => ch.material,
-        yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[2].value,
-      ),
-    ];
+        yValueMapper: (datum, index) => datum.scrab_ng[index].value,
+      );
+    }).toList();
   }
 
   @override
   void initState() {
     super.initState();
+    tanggal.text = datenow;
     getDataNG();
   }
 
@@ -77,38 +63,23 @@ class _SumNGPartState extends State<SumNGPart> {
             isVisible: true,
             isInversed: false,
             plotOffset: 0,
-            axisLine: AxisLine(color: white2Color),
+            axisLine: AxisLine(
+              color: white2Color,
+            ),
           ),
-          series: _dataChart()
-          // series: <ChartSeries>[
-          //   StackedColumnSeries<StockNGModel, String>(
-          //     dataSource: stock,
-          //     color: blueColor,
-          //     xValueMapper: (StockNGModel ch, _) => ch.material,
-          //     yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[0].value,
-          //   ),
-          //   StackedColumnSeries<StockNGModel, String>(
-          //     dataSource: stock,
-          //     color: purpleColor,
-          //     xValueMapper: (StockNGModel ch, _) => ch.material,
-          //     yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[1].value,
-          //   ),
-          //   StackedColumnSeries<StockNGModel, String>(
-          //     dataSource: stock,
-          //     color: pinkColor,
-          //     xValueMapper: (StockNGModel ch, _) => ch.material,
-          //     yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[2].value,
-          //   ),
-          // ],
-          );
+          series: _dataChart());
     }
 
     Widget getTableSummaryNG() {
       return SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Container(
-          decoration:
-              BoxDecoration(border: Border.all(width: 1, color: white3Color)),
+          decoration: BoxDecoration(
+            border: Border.all(
+              width: 1,
+              color: white3Color,
+            ),
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -204,32 +175,19 @@ class _SumNGPartState extends State<SumNGPart> {
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text(
-                                    data.scrab_ng[0].name,
-                                    style: textOpenSans.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: regular,
-                                      color: black5Color,
-                                    ),
-                                  ),
-                                  Text(
-                                    data.scrab_ng[1].name,
-                                    style: textOpenSans.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: regular,
-                                      color: black5Color,
-                                    ),
-                                  ),
-                                  Text(
-                                    data.scrab_ng[2].name,
-                                    style: textOpenSans.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: regular,
-                                      color: black5Color,
-                                    ),
-                                  ),
-                                ],
+                                children: data.scrab_ng
+                                    .map(
+                                      (e) => Text(
+                                        e.name,
+                                        style: textOpenSans.copyWith(
+                                          fontSize: 15,
+                                          fontWeight: regular,
+                                          color: colors.map((e) => e).toList()[
+                                              data.scrab_ng.indexOf(e)],
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
                               ),
                             ),
                           ),
@@ -238,33 +196,16 @@ class _SumNGPartState extends State<SumNGPart> {
                               child: Column(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text(
-                                    data.scrab_ng[0].value.toString(),
-                                    style: textOpenSans.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: bold,
-                                      color: blueColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    data.scrab_ng[1].value.toString(),
-                                    style: textOpenSans.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: bold,
-                                      color: purpleColor,
-                                    ),
-                                  ),
-                                  Text(
-                                    data.scrab_ng[2].value.toString(),
-                                    style: textOpenSans.copyWith(
-                                      fontSize: 15,
-                                      fontWeight: bold,
-                                      color: pinkColor,
-                                    ),
-                                  ),
-                                  
-                                ],
+                                children: data.scrab_ng
+                                    .map((e) => Text(
+                                          e.value.toString(),
+                                          style: textOpenSans.copyWith(
+                                            fontSize: 15,
+                                            fontWeight: regular,
+                                            color: black5Color,
+                                          ),
+                                        ))
+                                    .toList(),
                               ),
                             ),
                           ),
@@ -306,13 +247,14 @@ class _SumNGPartState extends State<SumNGPart> {
                   Container(
                     height: 72,
                     width: MediaQuery.of(context).size.width * 0.315,
-                    // decoration: BoxDecoration(
-                    //   border: Border(
-                    //       left: BorderSide(width: 1, color: white3Color),),
-                    // ),
                     child: Center(
                       child: Text(
-                        '1000',
+                        stock.length == 0
+                            ? '0'
+                            : stock
+                                .map((e) => e.getQuantityNG())
+                                .reduce((value, element) => value + element)
+                                .toString(),
                         style: textOpenSans.copyWith(
                           fontSize: 15,
                           fontWeight: regular,
@@ -333,7 +275,9 @@ class _SumNGPartState extends State<SumNGPart> {
       children: [
         Container(
           width: MediaQuery.of(context).size.width,
-          margin: EdgeInsets.all(defaultMargin),
+          margin: EdgeInsets.all(
+            defaultMargin,
+          ),
           decoration: BoxDecoration(
             color: whiteColor,
             boxShadow: [
@@ -349,7 +293,9 @@ class _SumNGPartState extends State<SumNGPart> {
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(
+                  16,
+                ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -361,42 +307,61 @@ class _SumNGPartState extends State<SumNGPart> {
                         color: black2Color,
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      height: 30,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: white2Color),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.calendar_month,
-                            size: 16,
-                            color: primaryColor,
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Text(
-                            '25/11/2022',
-                            style: textOpenSans.copyWith(
-                              fontSize: 12,
-                              fontWeight: regular,
-                              color: blackColor,
+                    GestureDetector(
+                      onTap: () async {
+                        DateTime? pickedDate2 = await showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(2101),
+                        );
+                        if (pickedDate2 != null) {
+                          String formattedDate2 =
+                              DateFormat('yyyy-MM-dd').format(pickedDate2);
+                          print(formattedDate2);
+                          setState(
+                            () {
+                              tanggal.text = formattedDate2;
+                            },
+                          );
+                        } else {
+                          print('Date is not selected');
+                        }
+                      },
+                      child: Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        height: 30,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: white2Color),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.calendar_month,
+                              size: 16,
+                              color: primaryColor,
                             ),
-                          ),
-                          SizedBox(
-                            width: 8,
-                          ),
-                          Icon(
-                            Icons.expand_more,
-                            size: 20,
-                            color: black3Color,
-                          )
-                        ],
+                            SizedBox(
+                              width: 8,
+                            ),
+                            Text(
+                              tanggal.text == '' ? 'yyyy-mm-dd' : tanggal.text,
+                              style: textOpenSans.copyWith(
+                                fontSize: 12,
+                                fontWeight: regular,
+                                color: blackColor,
+                              ),
+                            ),
+                            Icon(
+                              Icons.expand_more,
+                              size: 20,
+                              color: black3Color,
+                            )
+                          ],
+                        ),
                       ),
                     )
                   ],
@@ -418,7 +383,9 @@ class _SumNGPartState extends State<SumNGPart> {
               ),
               getChartStackedSummaryNG(),
               Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(
+                  12,
+                ),
                 child: Wrap(
                   spacing: 8,
                   runSpacing: 8,
@@ -491,12 +458,16 @@ class _SumNGPartState extends State<SumNGPart> {
         ),
         Container(
           width: MediaQuery.of(context).size.width,
-          margin: EdgeInsets.all(defaultMargin),
+          margin: EdgeInsets.all(
+            defaultMargin,
+          ),
           decoration: BoxDecoration(
             color: whiteColor,
             boxShadow: [
               BoxShadow(
-                color: blackColor.withOpacity(0.5),
+                color: blackColor.withOpacity(
+                  0.5,
+                ),
                 blurRadius: 2,
               )
             ],
@@ -534,13 +505,12 @@ class _SumNGPartState extends State<SumNGPart> {
                 ),
               ),
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: getTableSummaryNG(),
               ),
               SizedBox(
-                height: 75,
-              )
+                height: 12,
+              ),
             ],
           ),
         )
