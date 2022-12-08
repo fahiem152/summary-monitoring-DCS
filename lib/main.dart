@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:monitoring_mobile/pages/details/sngp.dart';
 
 import 'package:monitoring_mobile/pages/get_started_page.dart';
 import 'package:monitoring_mobile/pages/login_page.dart';
 import 'package:monitoring_mobile/pages/portal_page.dart';
 import 'package:monitoring_mobile/splashscreen.dart';
 
-import 'pages/details/stock_fg.dart';
 import 'pages/home_page.dart';
 
 void main() {
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         '/portal': (context) => const PortalPage(),
         '/home': (context) => const HomePage(),
         // '/detail-home': (context) => const DetailHomePage(),
-        '/detail-stock-fg': (context) => const StockFG(),
+        '/detail-stock-ng': (context) => const SumNGPart(),
       },
     );
   }
