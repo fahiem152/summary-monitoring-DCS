@@ -5,8 +5,17 @@ class ProdFGInVSOut extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text("Ini Halaman Production FG In VS Out"),
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Card(
+              child: Text("Qty/Box"),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
