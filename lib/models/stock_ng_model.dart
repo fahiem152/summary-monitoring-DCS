@@ -3,6 +3,11 @@ List<StockNGModel> stockModelNGFromJson(List data) => List<StockNGModel>.from(
         (x) => StockNGModel.fromJson(x),
       ),
     );
+// List<ScrabNGModel> scrabModelNGFromJson(List data) => List<ScrabNGModel>.from(
+//       data.map(
+//         (x) => ScrabNGModel.fromJson(x),
+//       ),
+//     );
 
 class StockNGModel {
   String material;
@@ -14,17 +19,27 @@ class StockNGModel {
     required this.scrab_ng,
   });
   factory StockNGModel.fromJson(Map<String, dynamic> json) => StockNGModel(
-      material: json["material"],
-      material_number: json["material_number"],
-      scrab_ng: json['scrab_ng']
-          .map<ScrabNGModel>((scrab_ng) => ScrabNGModel.fromJson(scrab_ng))
-          .toList());
+        material: json["material"],
+        material_number: json["material_number"],
+        scrab_ng: json['scrab_ng']
+            .map<ScrabNGModel>((scrab_ng) => ScrabNGModel.fromJson(scrab_ng))
+            .toList(),
+      );
 
   Map<String, dynamic> toJson() => {
         "material": material,
         "material_number": material_number,
         "scrab_ng": scrab_ng.map((scarb_ng) => scarb_ng.toJson()).toList(),
       };
+
+  int getQuantityNG() {
+    return scrab_ng.fold(
+        0, (previousValue, element) => previousValue + element.value);
+  }
+
+  // int getTotalQuantityNG(int allQuantity) {
+  //   return allQuantity += getQuantityNG();
+  // }
 }
 
 class ScrabNGModel {

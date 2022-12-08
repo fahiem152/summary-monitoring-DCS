@@ -4,23 +4,341 @@ import 'package:flutter/material.dart';
 import 'package:monitoring_mobile/constan.dart';
 import 'package:monitoring_mobile/models/stock_ng_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:monitoring_mobile/theme.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-class SumNGPart extends StatelessWidget {
+class SumNGPart extends StatefulWidget {
   const SumNGPart({Key? key}) : super(key: key);
 
   @override
+  State<SumNGPart> createState() => _SumNGPartState();
+}
+
+class _SumNGPartState extends State<SumNGPart> {
+  List<StockNGModel> stock = [];
+  // List<ScrabNGModel> scrap = [];
+
+  // late int quantityNG;
+  // late StockNGModel stockNG;
+  bool loading = true;
+  void getDataNG() async {
+    var response = await http.get(
+      Uri.parse(
+        baseURL + "/api/stechoq/summary-ngp",
+      ),
+    );
+    List dataStock = json.decode(response.body);
+    print(json.decode(response.body));
+
+    // List dataScrap = json.decode(response.body);
+    // print(json.decode(response.body)['scrab_ng']);
+
+    setState(() {
+      stock = stockModelNGFromJson(dataStock);
+      // scrap = scrabModelNGFromJson(dataScrap);
+
+      loading = false;
+    });
+  }
+
+  List<ChartSeries<StockNGModel, String>> _dataChart() {
+    return [
+      StackedColumnSeries<StockNGModel, String>(
+        dataSource: stock,
+        xValueMapper: (StockNGModel ch, _) => ch.material,
+        yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[0].value,
+      ),
+      StackedColumnSeries<StockNGModel, String>(
+        dataSource: stock,
+        xValueMapper: (StockNGModel ch, _) => ch.material,
+        yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[1].value,
+      ),
+      StackedColumnSeries<StockNGModel, String>(
+        dataSource: stock,
+        xValueMapper: (StockNGModel ch, _) => ch.material,
+        yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[2].value,
+      ),
+    ];
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getDataNG();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    Widget getChartStackedSummaryNG() {
+      return SfCartesianChart(
+          plotAreaBackgroundColor: whiteColor,
+          plotAreaBorderColor: white2Color,
+          primaryXAxis: CategoryAxis(
+            isVisible: true,
+            isInversed: false,
+            plotOffset: 0,
+            axisLine: AxisLine(color: white2Color),
+          ),
+          series: _dataChart()
+          // series: <ChartSeries>[
+          //   StackedColumnSeries<StockNGModel, String>(
+          //     dataSource: stock,
+          //     color: blueColor,
+          //     xValueMapper: (StockNGModel ch, _) => ch.material,
+          //     yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[0].value,
+          //   ),
+          //   StackedColumnSeries<StockNGModel, String>(
+          //     dataSource: stock,
+          //     color: purpleColor,
+          //     xValueMapper: (StockNGModel ch, _) => ch.material,
+          //     yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[1].value,
+          //   ),
+          //   StackedColumnSeries<StockNGModel, String>(
+          //     dataSource: stock,
+          //     color: pinkColor,
+          //     xValueMapper: (StockNGModel ch, _) => ch.material,
+          //     yValueMapper: (StockNGModel ch, _) => ch.scrab_ng[2].value,
+          //   ),
+          // ],
+          );
+    }
+
+    Widget getTableSummaryNG() {
+      return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Container(
+          decoration:
+              BoxDecoration(border: Border.all(width: 1, color: white3Color)),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              DataTable(
+                border: TableBorder.all(width: 1, color: white3Color),
+                dataRowHeight: 72,
+                headingRowHeight: 30,
+                headingRowColor: MaterialStateColor.resolveWith(
+                  (states) => black4Color,
+                ),
+                columns: <DataColumn>[
+                  DataColumn(
+                    label: Text(
+                      'Material',
+                      style: textOpenSans.copyWith(
+                        fontSize: 13,
+                        fontWeight: regular,
+                        color: whiteColor,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Material Number',
+                      style: textOpenSans.copyWith(
+                        fontSize: 13,
+                        fontWeight: regular,
+                        color: whiteColor,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Scrap NG',
+                      style: textOpenSans.copyWith(
+                        fontSize: 13,
+                        fontWeight: regular,
+                        color: whiteColor,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Quantity Scrab',
+                      style: textOpenSans.copyWith(
+                        fontSize: 13,
+                        fontWeight: regular,
+                        color: whiteColor,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Quantity NG',
+                      style: textOpenSans.copyWith(
+                        fontSize: 13,
+                        fontWeight: regular,
+                        color: whiteColor,
+                      ),
+                    ),
+                  ),
+                ],
+                rows: stock
+                    .map(
+                      (data) => DataRow(
+                        cells: [
+                          DataCell(
+                            Center(
+                              child: Text(
+                                data.material,
+                                style: textOpenSans.copyWith(
+                                  fontSize: 15,
+                                  fontWeight: regular,
+                                  color: black5Color,
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Center(
+                              child: Text(
+                                data.material_number,
+                                style: textOpenSans.copyWith(
+                                  fontSize: 13,
+                                  fontWeight: regular,
+                                  color: black5Color,
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Center(
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    data.scrab_ng[0].name,
+                                    style: textOpenSans.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: regular,
+                                      color: black5Color,
+                                    ),
+                                  ),
+                                  Text(
+                                    data.scrab_ng[1].name,
+                                    style: textOpenSans.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: regular,
+                                      color: black5Color,
+                                    ),
+                                  ),
+                                  Text(
+                                    data.scrab_ng[2].name,
+                                    style: textOpenSans.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: regular,
+                                      color: black5Color,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Center(
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text(
+                                    data.scrab_ng[0].value.toString(),
+                                    style: textOpenSans.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: bold,
+                                      color: blueColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    data.scrab_ng[1].value.toString(),
+                                    style: textOpenSans.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: bold,
+                                      color: purpleColor,
+                                    ),
+                                  ),
+                                  Text(
+                                    data.scrab_ng[2].value.toString(),
+                                    style: textOpenSans.copyWith(
+                                      fontSize: 15,
+                                      fontWeight: bold,
+                                      color: pinkColor,
+                                    ),
+                                  ),
+                                  
+                                ],
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Center(
+                              child: Text(
+                                data.getQuantityNG().toString(),
+                                style: textOpenSans.copyWith(
+                                  fontSize: 15,
+                                  fontWeight: regular,
+                                  color: black5Color,
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                    .toList(),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    height: 72,
+                    width: MediaQuery.of(context).size.width,
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        'Total',
+                        style: textOpenSans.copyWith(
+                          fontSize: 15,
+                          fontWeight: regular,
+                          color: black5Color,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    height: 72,
+                    width: MediaQuery.of(context).size.width * 0.315,
+                    // decoration: BoxDecoration(
+                    //   border: Border(
+                    //       left: BorderSide(width: 1, color: white3Color),),
+                    // ),
+                    child: Center(
+                      child: Text(
+                        '1000',
+                        style: textOpenSans.copyWith(
+                          fontSize: 15,
+                          fontWeight: regular,
+                          color: black5Color,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return ListView(
       children: [
         Container(
           width: MediaQuery.of(context).size.width,
-          margin: EdgeInsets.all(30),
+          margin: EdgeInsets.all(defaultMargin),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: whiteColor,
             boxShadow: [
               BoxShadow(
-                color: Color(0xff404040).withOpacity(0.5),
+                color: blackColor.withOpacity(0.5),
                 blurRadius: 2,
               )
             ],
@@ -37,12 +355,10 @@ class SumNGPart extends StatelessWidget {
                   children: [
                     Text(
                       'Bar Chart Summary NG Part',
-                      style: TextStyle(
+                      style: textOpenSans.copyWith(
                         fontSize: 12,
-                        fontWeight: FontWeight.w700,
-                        color: Color(
-                          0xff404040,
-                        ),
+                        fontWeight: bold,
+                        color: black2Color,
                       ),
                     ),
                     Container(
@@ -52,31 +368,24 @@ class SumNGPart extends StatelessWidget {
                       ),
                       height: 30,
                       decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(8),
-                        color: Color(
-                          0xffECECEC,
-                        ),
-                      ),
+                          borderRadius: BorderRadius.circular(8),
+                          color: white2Color),
                       child: Row(
                         children: [
                           Icon(
                             Icons.calendar_month,
-                            size: 14,
-                            color: Color(
-                              0xff6E5DE7,
-                            ),
+                            size: 16,
+                            color: primaryColor,
                           ),
                           SizedBox(
                             width: 8,
                           ),
                           Text(
                             '25/11/2022',
-                            style: TextStyle(
+                            style: textOpenSans.copyWith(
                               fontSize: 12,
-                              fontWeight: FontWeight.w400,
-                              color: Color(
-                                0xff333333,
-                              ),
+                              fontWeight: regular,
+                              color: blackColor,
                             ),
                           ),
                           SizedBox(
@@ -85,7 +394,7 @@ class SumNGPart extends StatelessWidget {
                           Icon(
                             Icons.expand_more,
                             size: 20,
-                            color: Color(0xff363B3F),
+                            color: black3Color,
                           )
                         ],
                       ),
@@ -100,27 +409,94 @@ class SumNGPart extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: Color(
-                        0xffECECEC,
-                      ),
+                      color: white2Color,
                       width: 4,
                       style: BorderStyle.solid,
                     ),
                   ),
                 ),
               ),
-              StackedChartSummaryNG()
+              getChartStackedSummaryNG(),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    Column(
+                      children: [
+                        Container(
+                          height: 8,
+                          width: 20,
+                          color: blueColor,
+                        ),
+                        SizedBox(
+                          height: 4,
+                        ),
+                        Text(
+                          'Data 1',
+                          style: textInter.copyWith(
+                            fontSize: 10,
+                            fontWeight: regular,
+                            color: black7Color,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Container(
+                          height: 8,
+                          width: 20,
+                          color: purpleColor,
+                        ),
+                        SizedBox(
+                          height: 4,
+                        ),
+                        Text(
+                          'Data 2',
+                          style: textInter.copyWith(
+                            fontSize: 10,
+                            fontWeight: regular,
+                            color: black7Color,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Container(
+                          height: 8,
+                          width: 20,
+                          color: pinkColor,
+                        ),
+                        SizedBox(
+                          height: 4,
+                        ),
+                        Text(
+                          'Data 3',
+                          style: textInter.copyWith(
+                            fontSize: 10,
+                            fontWeight: regular,
+                            color: black7Color,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              )
             ],
           ),
         ),
         Container(
           width: MediaQuery.of(context).size.width,
-          margin: EdgeInsets.all(30),
+          margin: EdgeInsets.all(defaultMargin),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: whiteColor,
             boxShadow: [
               BoxShadow(
-                color: Color(0xff404040).withOpacity(0.5),
+                color: blackColor.withOpacity(0.5),
                 blurRadius: 2,
               )
             ],
@@ -136,9 +512,10 @@ class SumNGPart extends StatelessWidget {
                 ),
                 child: Text(
                   'Table No Good Opname',
-                  style: TextStyle(
+                  style: textOpenSans.copyWith(
                     fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: bold,
+                    color: black6Color,
                   ),
                 ),
               ),
@@ -149,126 +526,25 @@ class SumNGPart extends StatelessWidget {
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: Color(
-                        0xffECECEC,
-                      ),
+                      color: white2Color,
                       width: 4,
                       style: BorderStyle.solid,
                     ),
                   ),
                 ),
               ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+                child: getTableSummaryNG(),
+              ),
+              SizedBox(
+                height: 75,
+              )
             ],
           ),
         )
       ],
     );
   }
-}
-
-class StackedChartSummaryNG extends StatefulWidget {
-  StackedChartSummaryNG({Key? key}) : super(key: key);
-
-  @override
-  State<StackedChartSummaryNG> createState() => _StackedChartSummaryNGState();
-}
-
-class _StackedChartSummaryNGState extends State<StackedChartSummaryNG> {
-  List<StockNGModel> stock = [];
-  late StockNGModel stockNG;
-  bool loading = true;
-  void getDataNG() async {
-    var response = await http.get(
-      Uri.parse(
-        baseURL + "/api/stechoq/summary-ngp",
-      ),
-    );
-    List data = json.decode(response.body);
-    print(json.decode(response.body));
-
-    setState(() {
-      //memasukan data json ke dalam model
-      stock = stockModelNGFromJson(data);
-      loading = false;
-    });
-    print('ini adalah data stock: ${stock.length}');
-  }
-
-  final List<ChartData> chartData = [
-    ChartData('India', 20, 30, 40, 50),
-    ChartData('UK', 20, 50, 40, 20),
-    ChartData('Amerika', 10, 20, 30, 50),
-    ChartData('China', 30, 20, 50, 10),
-    ChartData('Indonesia', 30, 50, 50, 10),
-  ];
-  @override
-  void initState() {
-    super.initState();
-    getDataNG();
-    // fungsiGetStockOpname();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return SfCartesianChart(
-      plotAreaBackgroundColor: Colors.white,
-      plotAreaBorderColor: Color(0xffECECEC),
-      primaryXAxis: CategoryAxis(
-        isVisible: true,
-        isInversed: false,
-        // desiredIntervals: 1,
-
-        plotOffset: 0,
-        axisLine: AxisLine(
-          color: Color(
-            0xffECECEC,
-          ),
-        ),
-      ),
-      series: <ChartSeries>[
-        StackedColumnSeries<ChartData, String>(
-          dataSource: chartData,
-          xValueMapper: (ChartData ch, _) => ch.x,
-          yValueMapper: (ChartData ch, _) => ch.y1,
-        ),
-        StackedColumnSeries<ChartData, String>(
-          dataSource: chartData,
-          xValueMapper: (ChartData ch, _) => ch.x,
-          yValueMapper: (ChartData ch, _) => ch.y2,
-        ),
-        StackedColumnSeries<ChartData, String>(
-          dataSource: chartData,
-          xValueMapper: (ChartData ch, _) => ch.x,
-          yValueMapper: (ChartData ch, _) => ch.y3,
-        ),
-        StackedColumnSeries<ChartData, String>(
-          color: Colors.amber,
-          dataSource: chartData,
-          xValueMapper: (ChartData ch, _) => ch.x,
-          yValueMapper: (ChartData ch, _) => ch.y4,
-        ),
-        StackedColumnSeries<ChartData, String>(
-          color: Colors.red,
-          dataSource: chartData,
-          xValueMapper: (ChartData ch, _) => ch.x,
-          yValueMapper: (ChartData ch, _) => 50,
-        ),
-      ],
-    );
-  }
-}
-
-class ChartData {
-  final String x;
-  final int y1;
-  final int y2;
-  final int y3;
-  final int y4;
-  ChartData(
-    this.x,
-    this.y1,
-    this.y2,
-    this.y3,
-    this.y4,
-  );
 }
