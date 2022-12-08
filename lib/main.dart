@@ -6,7 +6,7 @@ import 'package:monitoring_mobile/pages/login_page.dart';
 import 'package:monitoring_mobile/pages/portal_page.dart';
 import 'package:monitoring_mobile/splashscreen.dart';
 
-import 'pages/details/stock_fg.dart';
+
 import 'pages/home_page.dart';
 
 void main() {
