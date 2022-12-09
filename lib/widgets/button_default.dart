@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:monitoring_mobile/theme.dart';
 
 class ButtonCustom extends StatelessWidget {
-  const ButtonCustom({Key? key, required this.title, required this.press}) : super(key: key);
+  const ButtonCustom({Key? key, required this.title, required this.press})
+      : super(key: key);
 
   final String title;
   final VoidCallback press;
@@ -14,7 +15,7 @@ class ButtonCustom extends StatelessWidget {
       onTap: press,
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
-        height: 55,
+        height: 45,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: primaryColor,

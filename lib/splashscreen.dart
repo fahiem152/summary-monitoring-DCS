@@ -55,7 +55,10 @@ class _SplashScreen extends State<SplashScreen> {
             Expanded(
               child: Align(
                 alignment: Alignment.center,
-                child: Image.asset('assets/images/group.png'),
+                child: Image.asset(
+                  'assets/images/logo-dcs.png',
+                  width: 265,
+                ),
               ),
             ),
             Align(
