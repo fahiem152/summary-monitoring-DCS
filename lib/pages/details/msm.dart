@@ -208,9 +208,11 @@ class _MonitoringSMState extends State<MonitoringSM> {
                                       default:
                                     }
                                   }),
-                                  labelPadding: 15,
+                                  labelPadding: 20,
                                   labelLineColor: primaryColor,
-                                  labelColor: blackColor,
+                                  labelColor: whiteColor,
+                                  labelFontSize: 12,
+                                  labelLinelength: 16,
                                   pieLabel: (pieData, index) {
                                     return pieData['domain'] +
                                         ' : \n' +

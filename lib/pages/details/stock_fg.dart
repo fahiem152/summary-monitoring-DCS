@@ -247,15 +247,10 @@ class _StockFGState extends State<StockFG> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          SizedBox(
-                                            height: 18,
-                                            child: IconTheme(
-                                              data: IconThemeData(
-                                                  color: primaryColor),
-                                              child: const ImageIcon(
-                                                AssetImage(
-                                                    'assets/icons/Calendar.png'),
-                                              ),
+                                          Center(
+                                            child: Icon(
+                                              Icons.calendar_month,
+                                              color: primaryColor,
                                             ),
                                           ),
                                           Text(

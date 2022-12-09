@@ -93,7 +93,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
 
     return SingleChildScrollView(
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(15),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
