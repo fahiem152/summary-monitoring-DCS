@@ -3,11 +3,11 @@ List<StockNGModel> stockModelNGFromJson(List data) => List<StockNGModel>.from(
         (x) => StockNGModel.fromJson(x),
       ),
     );
-// List<ScrabNGModel> scrabModelNGFromJson(List data) => List<ScrabNGModel>.from(
-//       data.map(
-//         (x) => ScrabNGModel.fromJson(x),
-//       ),
-//     );
+List<ScrabNGModel> scrabModelNGFromJson(List data) => List<ScrabNGModel>.from(
+      data.map(
+        (x) => ScrabNGModel.fromJson(x),
+      ),
+    );
 
 class StockNGModel {
   String material;
@@ -36,14 +36,6 @@ class StockNGModel {
     return scrab_ng.fold(
         0, (previousValue, element) => previousValue + element.value);
   }
-
-  // int getTotalAllQuantityNG() {
-  //   return scrab_ng.fold(
-  //       0, (previousValue, element) => previousValue + element.value);
-  // }
-  // int getTotalQuantityNG(int allQuantity) {
-  //   return allQuantity += getQuantityNG();
-  // }
 }
 
 class ScrabNGModel {
