@@ -254,7 +254,7 @@ class _StockFGState extends State<StockFG> {
                                                   color: primaryColor),
                                               child: const ImageIcon(
                                                 AssetImage(
-                                                    'assets/icons/Calendar.png'),
+                                                    'assets/icons/calendar.png'),
                                               ),
                                             ),
                                           ),
