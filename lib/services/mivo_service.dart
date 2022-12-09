@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:monitoring_mobile/models/mivo2.model.dart';
+import 'package:monitoring_mobile/models/rak_model.dart';
 import 'package:monitoring_mobile/models/mivo_model.dart';
 import 'package:http/http.dart' as http;
 
