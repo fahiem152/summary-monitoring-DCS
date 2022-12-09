@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:monitoring_mobile/models/mivo2.model.dart';
-import 'package:monitoring_mobile/models/mivo_model.dart';
 import 'package:monitoring_mobile/services/mivo_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:monitoring_mobile/theme.dart';
@@ -24,14 +23,12 @@ class MaterialInVSOut extends StatefulWidget {
 
 class _MaterialInVSOutState extends State<MaterialInVSOut> {
   int touchedIndex = -1;
-  List<Mivo> dataMivo = [];
   bool loading = true;
   late Future<MonRak> futureMonRak;
   DateTime? _dateTime;
   String slcTypeRak = "racktypem";
   String slcAdressRak = "address1";
   List<DataRak> stock = [];
-  bool isSquare = false;
   double size = 22;
 
   @override
