@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:monitoring_mobile/models/homepage_tile.dart';
 import 'package:monitoring_mobile/pages/details/msm.dart';
 import 'package:monitoring_mobile/theme.dart';
+import 'package:lazy_load_indexed_stack/lazy_load_indexed_stack.dart';
 
 import 'mivo.dart';
 import 'pfgivo.dart';
@@ -26,11 +27,12 @@ class _DetailHomePageState extends State<DetailHomePage> {
     return PreferredSize(
       preferredSize: const Size.fromHeight(55.0),
       child: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: blackColor),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         backgroundColor: backgrounColor1,
         centerTitle: true,
-        iconTheme: IconThemeData(
-          color: black2Color,
-        ),
         elevation: 1,
         title: Text(
           widget.listBodyHome.title,
@@ -45,7 +47,7 @@ class _DetailHomePageState extends State<DetailHomePage> {
 
   // Body
   Widget getBody() {
-    return IndexedStack(
+    return LazyLoadIndexedStack(
       index: widget.index,
       children: const [
         MonitoringSM(),
