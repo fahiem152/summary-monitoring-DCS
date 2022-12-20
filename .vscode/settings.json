@@ -1,0 +1,9 @@
+{
+    "background.fullscreen": {
+    
+        "image": "",
+        "opacity": 0.91,
+        "size": "cover",
+        "interval": 0
+    }
+}

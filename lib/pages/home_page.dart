@@ -30,10 +30,18 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  removePred() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.remove("role");
+    preferences.remove("firstName");
+    preferences.remove("lastName");
+    preferences.commit();
+  }
+
   @override
   void initState() {
     super.initState();
-    getPref();
+    // getPref();
   }
 
   @override
@@ -63,16 +71,18 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            firstName == ''
-                                ? 'Waiting'
-                                : firstName + ' ' + lastName,
+                            // firstName == ''
+                            //     ? 'Waiting'
+                            //     : firstName + ' ' + lastName,
+                            "Admin",
                             style: blackTextStyle.copyWith(
                               fontWeight: semiBold,
                               fontSize: 24,
                             ),
                           ),
                           Text(
-                            role == '' ? 'Waiting' : role,
+                            // role == '' ? 'Waiting' : role,
+                            'Manager / BOD',
                             style: blackTextStyle.copyWith(
                               fontWeight: regular,
                               fontSize: 14,
@@ -108,14 +118,19 @@ class _HomePageState extends State<HomePage> {
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
-                              onPressed: () => logout().then(
-                                (value) => Navigator.of(context)
-                                    .pushAndRemoveUntil(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const GetStartedPage()),
-                                        (route) => false),
-                              ),
+                              onPressed: () {
+                                setState(() {
+                                  removePred();
+                                });
+                                logout().then(
+                                  (value) => Navigator.of(context)
+                                      .pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const GetStartedPage()),
+                                          (route) => false),
+                                );
+                              },
                               width: 120,
                             )
                           ],

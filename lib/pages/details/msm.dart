@@ -28,12 +28,17 @@ class _MonitoringSMState extends State<MonitoringSM> {
   List<dynamic> tabelStockList = [];
 
   void getData() async {
+    String token = await getToken();
     var response = await http.get(
       Uri.parse(
-        baseURL + "/stock-monitoring",
+        baseURL + "/api/material/stocks",
       ),
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Authorization': 'Bearer $token'
+      },
     );
-    var data = json.decode(response.body)['data'];
+    var data = json.decode(response.body)['list']['data'];
     setState(() {
       // stock = stockModelFromJson(data);
       stockMaterial = data;
@@ -42,6 +47,7 @@ class _MonitoringSMState extends State<MonitoringSM> {
   }
 
   List suplierlist = [];
+  // ignore: prefer_typing_uninitialized_variables
   var valueSuplier;
   Future getSuplier() async {
     String token = await getToken();
@@ -52,7 +58,6 @@ class _MonitoringSMState extends State<MonitoringSM> {
         'Authorization': 'Bearer $token'
       },
     );
-    print(response.body);
     if (response.statusCode == 200) {
       var jsonData = json.decode(response.body)['suplier'];
       setState(() {
@@ -118,8 +123,8 @@ class _MonitoringSMState extends State<MonitoringSM> {
     MsmModel msmModel = tabelStockList[index];
     return Row(
       children: <Widget>[
-        ItemListTabel(pWidth: 230, value: msmModel.partName),
-        ItemListTabel(pWidth: 80, value: msmModel.weight.toString()),
+        ItemListTabel(pWidth: 230, value: msmModel.batchMaterialName),
+        ItemListTabel(pWidth: 80, value: msmModel.actual.toString()),
         Container(
           color: Colors.red,
           child: const Center(
@@ -143,23 +148,219 @@ class _MonitoringSMState extends State<MonitoringSM> {
     super.initState();
     getData();
     fungsigetTabelMontoringMaterial();
-    getSuplier();
+    // getSuplier();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(10),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              SizedBox(
-                height: 400,
-                child: Card(
-                  child: loading
+    return Padding(
+      padding: const EdgeInsets.all(10),
+      child: SingleChildScrollView(
+        physics: ScrollPhysics(),
+        child: Column(
+          children: [
+            Card(
+              child: loading
+                  ? SizedBox(
+                      height: 500,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: primaryColor,
+                        ),
+                      ),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(
+                            'Monitoring Stock Material',
+                            style: textOpenSans.copyWith(
+                              color: blackColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          color: const Color.fromARGB(188, 158, 158, 158),
+                          height: 1,
+                        ),
+                        AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: DChartPie(
+                            data: stockMaterial.map((e) {
+                              return {
+                                'domain': e['material_name'],
+                                'measure': e['weight']
+                              };
+                            }).toList(),
+                            fillColor: ((pieData, index) {
+                              switch (index) {
+                                case 0:
+                                  return const Color(0xff0263FF);
+                                case 1:
+                                  return const Color(0xff8E30FF);
+                                case 2:
+                                  return const Color(0xffFF7723);
+                                case 3:
+                                  return const Color(0xffe17055);
+                                case 4:
+                                  return const Color(0xff6c5ce7);
+                                default:
+                              }
+                            }),
+                            labelPadding: 20,
+                            labelLineColor: primaryColor,
+                            labelColor: Colors.transparent,
+                            // labelPosition: PieLabelPosition.outside,
+                            labelFontSize: 12,
+                            labelLinelength: 16,
+                            // pieLabel: (pieData, index) {
+                            //   return pieData['domain'] +
+                            //       ' : \n' +
+                            //       pieData['measure'].toString();
+                            // },
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 15, right: 15, top: 15),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                height: 60,
+                                width: 50,
+                                child: Card(
+                                  child: Center(
+                                    child: Text(
+                                      stockMaterial.length.toString(),
+                                      style: textOpenSans.copyWith(
+                                        color: blackColor,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                child: SizedBox(
+                                  height: 60,
+                                  width: 50,
+                                  child: Card(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 15, left: 10),
+                                      child: Text(
+                                        'Material Stock',
+                                        style: textOpenSans.copyWith(
+                                          color: blackColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          letterSpacing: 1,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: stockMaterial.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Container(
+                                        color: stockMaterial[index]
+                                                    ['material_id'] ==
+                                                0
+                                            ? const Color(0xff0263FF)
+                                            : stockMaterial[index]
+                                                        ['material_id'] ==
+                                                    1
+                                                ? const Color(0xff8E30FF)
+                                                : stockMaterial[index]
+                                                            ['material_id'] ==
+                                                        2
+                                                    ? const Color(0xffFF7723)
+                                                    : stockMaterial[index][
+                                                                'material_id'] ==
+                                                            3
+                                                        ? const Color(
+                                                            0xffe17055)
+                                                        : const Color(
+                                                            0xff6c5ce7),
+                                        height: 10,
+                                        width: 20,
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            '${stockMaterial[index]['weight'].toString()} Kg',
+                                            style: textOpenSans.copyWith(
+                                              color: blackColor,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.normal,
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 10,
+                                          ),
+                                          Text(
+                                            stockMaterial[index]
+                                                ['material_name'],
+                                            style: textOpenSans.copyWith(
+                                              color: blackColor,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    ],
+                                  ),
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            SizedBox(
+              height: 500,
+              width: MediaQuery.of(context).size.width,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: _loading
                       ? SizedBox(
-                          height: 500,
+                          height: 400,
                           child: Center(
                             child: CircularProgressIndicator(
                               color: primaryColor,
@@ -167,211 +368,186 @@ class _MonitoringSMState extends State<MonitoringSM> {
                           ),
                         )
                       : Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                'Monitoring Stock Material',
-                                style: textOpenSans.copyWith(
-                                  color: blackColor,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: 1,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Stock Opname Finish Good',
+                                  style: textOpenSans.copyWith(
+                                    color: blackColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
                                 ),
-                              ),
-                            ),
-                            Container(
-                              color: const Color.fromARGB(188, 158, 158, 158),
-                              height: 1,
-                            ),
-                            Expanded(
-                              child: DChartPie(
-                                  data: stockMaterial.map((e) {
-                                    return {
-                                      'domain': e['name'],
-                                      'measure': e['value']
-                                    };
-                                  }).toList(),
-                                  fillColor: ((pieData, index) {
-                                    switch (index) {
-                                      case 0:
-                                        return const Color(0xff0263FF);
-                                      case 1:
-                                        return const Color(0xff8E30FF);
-                                      case 2:
-                                        return const Color(0xffFF7723);
-                                      case 3:
-                                        return const Color(0xffe17055);
-                                      case 4:
-                                        return const Color(0xff6c5ce7);
-                                      default:
-                                    }
-                                  }),
-                                  labelPadding: 20,
-                                  labelLineColor: primaryColor,
-                                  labelColor: whiteColor,
-                                  labelFontSize: 12,
-                                  labelLinelength: 16,
-                                  pieLabel: (pieData, index) {
-                                    return pieData['domain'] +
-                                        ' : \n' +
-                                        pieData['measure'].toString();
-                                  }),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(15),
-                              child: Row(
-                                children: [
-                                  SizedBox(
-                                    height: 60,
-                                    width: 50,
-                                    child: Card(
-                                      child: Center(
-                                        child: Text(
-                                          stockMaterial.length.toString(),
-                                          style: textOpenSans.copyWith(
-                                            color: blackColor,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w700,
-                                            letterSpacing: 1,
-                                          ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Container(
+                                  height: 40,
+                                  width: 110,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: primaryColor, width: 1.0),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                        icon: const ImageIcon(
+                                          AssetImage(
+                                              'assets/icons/arrow-down.png'),
                                         ),
+                                        dropdownColor: Color(0xffF0F1F2),
+                                        borderRadius: BorderRadius.circular(15),
+                                        hint: const Text('Supplier'),
+                                        items: suplierlist.map((item) {
+                                          return DropdownMenuItem(
+                                            value: item['name_sup'].toString(),
+                                            child: Text(
+                                                item['name_sup'].toString()),
+                                          );
+                                        }).toList(),
+                                        onChanged: (newVal) {
+                                          setState(() {
+                                            valueSuplier = newVal;
+                                            print(valueSuplier);
+                                          });
+                                        },
+                                        value: valueSuplier,
                                       ),
                                     ),
                                   ),
-                                  Expanded(
-                                    child: SizedBox(
-                                      height: 60,
-                                      width: 50,
-                                      child: Card(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              top: 15, left: 10),
-                                          child: Text(
-                                            'Material Stock',
-                                            style: textOpenSans.copyWith(
-                                              color: blackColor,
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w700,
-                                              letterSpacing: 1,
-                                            ),
-                                          ),
-                                        ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Container(
+                              height: 35,
+                              width: MediaQuery.of(context).size.width,
+                              decoration: BoxDecoration(
+                                border:
+                                    Border.all(width: 1, color: primaryColor),
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Type',
+                                      style: textOpenSans.copyWith(
+                                        color: blackColor,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                  )
-                                ],
+                                    Text(
+                                      'Min Stock(gr)',
+                                      style: textOpenSans.copyWith(
+                                        color: blackColor,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Max Stock(gr)',
+                                      style: textOpenSans.copyWith(
+                                        color: blackColor,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            ListView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: 2,
+                              itemBuilder: (context, index) {
+                                MsmModel msmModel = tabelStockList[index];
+                                return Container(
+                                  height: 35,
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration: BoxDecoration(
+                                      border: Border(
+                                    left: BorderSide(
+                                        width: 1, color: black2Color),
+                                    right: BorderSide(
+                                        width: 1, color: black2Color),
+                                    bottom: BorderSide(
+                                        width: 1, color: black2Color),
+                                  )),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          msmModel.type,
+                                          style: textOpenSans.copyWith(
+                                            color: blackColor,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          msmModel.qtyMin.toString(),
+                                          style: textOpenSans.copyWith(
+                                            color: blackColor,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          msmModel.qtyMax.toString(),
+                                          style: textOpenSans.copyWith(
+                                            color: blackColor,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(
+                              height: 20,
+                            ),
+                            Expanded(
+                              child: HorizontalDataTable(
+                                leftHandSideColumnWidth: 50,
+                                rightHandSideColumnWidth: 380,
+                                isFixedHeader: true,
+                                headerWidgets: _getTitle(),
+                                leftSideItemBuilder: _firstColumnRow,
+                                rightSideItemBuilder: _rightHandSideColumnRow,
+                                itemCount: tabelStockList.length,
+                                rowSeparatorWidget: const Divider(
+                                  color: Colors.black54,
+                                  height: 1.0,
+                                  thickness: 0.0,
+                                ),
+                                // leftHandSideColBackgroundColor: Color(0xFFFFFFFF),
+                                // rightHandSideColBackgroundColor: Color(0xFFFFFFFF),
                               ),
                             ),
                           ],
                         ),
                 ),
               ),
-              const SizedBox(
-                height: 20,
-              ),
-              SizedBox(
-                height: 500,
-                width: MediaQuery.of(context).size.width,
-                child: Card(
-                  child: Padding(
-                    padding: const EdgeInsets.all(15.0),
-                    child: _loading
-                        ? SizedBox(
-                            height: 400,
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                color: primaryColor,
-                              ),
-                            ),
-                          )
-                        : Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Stock Opname Finish Good',
-                                    style: textOpenSans.copyWith(
-                                      color: blackColor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                    ),
-                                  ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    width: 110,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: primaryColor, width: 1.0),
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton(
-                                          icon: const ImageIcon(
-                                            AssetImage(
-                                                'assets/icons/arrow-down.png'),
-                                          ),
-                                          dropdownColor: Color(0xffF0F1F2),
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          hint: const Text('Supplier'),
-                                          items: suplierlist.map((item) {
-                                            return DropdownMenuItem(
-                                              value:
-                                                  item['name_sup'].toString(),
-                                              child: Text(
-                                                  item['name_sup'].toString()),
-                                            );
-                                          }).toList(),
-                                          onChanged: (newVal) {
-                                            setState(() {
-                                              valueSuplier = newVal;
-                                              print(valueSuplier);
-                                            });
-                                          },
-                                          value: valueSuplier,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 20,
-                              ),
-                              Expanded(
-                                child: HorizontalDataTable(
-                                  leftHandSideColumnWidth: 50,
-                                  rightHandSideColumnWidth: 380,
-                                  isFixedHeader: true,
-                                  headerWidgets: _getTitle(),
-                                  leftSideItemBuilder: _firstColumnRow,
-                                  rightSideItemBuilder: _rightHandSideColumnRow,
-                                  itemCount: tabelStockList.length,
-                                  rowSeparatorWidget: const Divider(
-                                    color: Colors.black54,
-                                    height: 1.0,
-                                    thickness: 0.0,
-                                  ),
-                                  // leftHandSideColBackgroundColor: Color(0xFFFFFFFF),
-                                  // rightHandSideColBackgroundColor: Color(0xFFFFFFFF),
-                                ),
-                              ),
-                            ],
-                          ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );

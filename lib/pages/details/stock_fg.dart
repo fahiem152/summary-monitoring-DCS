@@ -1,5 +1,3 @@
-// ignore_for_file: avoid_print
-
 import 'dart:convert';
 
 import 'package:flutter/gestures.dart';
@@ -33,16 +31,22 @@ class _StockFGState extends State<StockFG> {
   List<dynamic> tabelStockList = [];
 
   void getData() async {
+    String token = await getToken();
     var response = await http.get(
       Uri.parse(
-        baseURL + "/api/stechoq/stock-fg",
+        baseURL + "/api/fg/stock/chart",
       ),
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Authorization': 'Bearer $token'
+      },
     );
-    List data = json.decode(response.body)['data'];
+    List data = json.decode(response.body)['list']['data'];
 
     setState(() {
       //memasukan data json ke dalam model
       stock = stockModelFromJson(data);
+
       loading = false;
     });
   }
@@ -90,12 +94,11 @@ class _StockFGState extends State<StockFG> {
   List<charts.Series<StockFGModel, String>> chartStockOpnameFg() {
     return [
       charts.Series<StockFGModel, String>(
-        data: stock,
-        id: 'id',
-        seriesColor: charts.ColorUtil.fromDartColor(primaryColor),
-        domainFn: (StockFGModel stockFGModel, _) => stockFGModel.name,
-        measureFn: (StockFGModel stockFGModel, _) => stockFGModel.value,
-      )
+          data: stock,
+          id: 'id',
+          seriesColor: charts.ColorUtil.fromDartColor(primaryColor),
+          domainFn: (StockFGModel stockFGModel, _) => stockFGModel.partName,
+          measureFn: (StockFGModel stockFGModel, _) => stockFGModel.qty)
     ];
   }
 
@@ -140,18 +143,22 @@ class _StockFGState extends State<StockFG> {
     TabelStckFGModel tabelStckFGModel = tabelStockList[index];
     return Row(
       children: <Widget>[
-        ItemListTabel(pWidth: 230, value: tabelStckFGModel.name),
+        ItemListTabel(pWidth: 230, value: tabelStckFGModel.partName),
         ItemListTabel(pWidth: 50, value: tabelStckFGModel.min.toString()),
         ItemListTabel(pWidth: 50, value: tabelStckFGModel.max.toString()),
-        ItemListTabel(pWidth: 70, value: tabelStckFGModel.inbound),
-        ItemListTabel(pWidth: 80, value: tabelStckFGModel.outbound),
-        ItemListTabel(pWidth: 50, value: tabelStckFGModel.sisa),
+        ItemListTabel(pWidth: 70, value: tabelStckFGModel.inbound.toString()),
+        ItemListTabel(pWidth: 80, value: tabelStckFGModel.outbond.toString()),
+        ItemListTabel(pWidth: 50, value: tabelStckFGModel.sisa.toString()),
         Container(
-          color: Colors.red,
-          child: const Center(
+          color: tabelStckFGModel.status == 'normal'
+              ? Colors.green
+              : tabelStckFGModel.status == '0VERLOAD'
+                  ? Colors.red
+                  : Colors.orange,
+          child: Center(
             child: Text(
-              'Over',
-              style: TextStyle(color: Colors.white),
+              tabelStckFGModel.status,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
           width: 70,
@@ -169,7 +176,7 @@ class _StockFGState extends State<StockFG> {
     super.initState();
     getData();
     fungsigetTabelStockOpnameFg();
-    getSuplier();
+    // getSuplier();
     tanggal.text = datenow;
   }
 
@@ -180,121 +187,118 @@ class _StockFGState extends State<StockFG> {
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
-            SizedBox(
-              height: 400,
-              child: Card(
-                child: loading
-                    ? SizedBox(
-                        height: 400,
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            color: primaryColor,
-                          ),
+            Card(
+              child: loading
+                  ? SizedBox(
+                      height: 400,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: primaryColor,
                         ),
-                      )
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Text(
-                                  'Stock Opname Finish Good',
-                                  style: textOpenSans.copyWith(
-                                    color: blackColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                      ),
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text(
+                                'Stock Opname Finish Good',
+                                style: textOpenSans.copyWith(
+                                  color: blackColor,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
                                 ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                InkWell(
-                                  onTap: () async {
-                                    DateTime? pickedDate2 =
-                                        await showDatePicker(
-                                            context: context,
-                                            initialDate: DateTime.now(),
-                                            firstDate: DateTime(2000),
-                                            lastDate: DateTime(2101));
+                              ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              InkWell(
+                                onTap: () async {
+                                  DateTime? pickedDate2 = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2101));
 
-                                    if (pickedDate2 != null) {
-                                      String formattedDate2 =
-                                          DateFormat('dd/MM/yyyy')
-                                              .format(pickedDate2);
-                                      print(formattedDate2);
+                                  if (pickedDate2 != null) {
+                                    String formattedDate2 =
+                                        DateFormat('dd/MM/yyyy')
+                                            .format(pickedDate2);
+                                    print(formattedDate2);
 
-                                      setState(() {
-                                        tanggal.text = formattedDate2;
-                                      });
-                                    } else {
-                                      print("Date is not selected");
-                                    }
-                                  },
-                                  child: Container(
-                                    height: 40,
-                                    width: 140,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(color: primaryColor),
-                                        borderRadius:
-                                            BorderRadius.circular(15)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 15),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Center(
-                                            child: Icon(
-                                              Icons.calendar_month,
-                                              color: primaryColor,
-                                            ),
+                                    setState(() {
+                                      tanggal.text = formattedDate2;
+                                    });
+                                  } else {
+                                    print("Date is not selected");
+                                  }
+                                },
+                                child: Container(
+                                  height: 40,
+                                  width: 140,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: primaryColor),
+                                      borderRadius: BorderRadius.circular(15)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 15),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Center(
+                                          child: Icon(
+                                            Icons.calendar_month,
+                                            color: primaryColor,
                                           ),
-                                          Text(
-                                            tanggal.text == ''
-                                                ? 'dd/mm/yyy'
-                                                : tanggal.text,
-                                            style: TextStyle(
-                                              color: black2Color,
-                                              fontSize: 14,
-                                            ),
+                                        ),
+                                        Text(
+                                          tanggal.text == ''
+                                              ? 'dd/mm/yyy'
+                                              : tanggal.text,
+                                          style: TextStyle(
+                                            color: black2Color,
+                                            fontSize: 14,
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          Container(
-                            color: const Color.fromARGB(188, 158, 158, 158),
-                            height: 1,
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: charts.BarChart(chartStockOpnameFg(),
-                                  animate: true,
-                                  domainAxis: const charts.OrdinalAxisSpec(
-                                    renderSpec: charts.SmallTickRendererSpec(
-                                        // Rotation Here,
-                                        // labelRotation: -85,
-                                        // labelAnchor: charts.TickLabelAnchor.before,
-                                        // labelOffsetFromTickPx: -5,
-                                        ),
-                                  )),
-                            ),
-                          ),
-                        ],
-                      ),
-              ),
+                        ),
+                        Container(
+                          color: const Color.fromARGB(188, 158, 158, 158),
+                          height: 1,
+                        ),
+                        Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: AspectRatio(
+                              aspectRatio: 1 / 1,
+                              child: charts.BarChart(
+                                chartStockOpnameFg(),
+                                animate: true,
+                                domainAxis: const charts.OrdinalAxisSpec(
+                                  renderSpec: charts.SmallTickRendererSpec(
+                                    // Rotation Here,
+                                    labelRotation: -90,
+                                    labelAnchor: charts.TickLabelAnchor.before,
+                                    labelOffsetFromTickPx: -5,
+                                  ),
+                                ),
+                              ),
+                            )),
+                      ],
+                    ),
             ),
             const SizedBox(
-              height: 20,
+              height: 100,
             ),
             SizedBox(
               height: 500,
@@ -302,7 +306,7 @@ class _StockFGState extends State<StockFG> {
               child: Card(
                 child: Padding(
                   padding: const EdgeInsets.all(15.0),
-                  child: _loading
+                  child: loading
                       ? SizedBox(
                           height: 400,
                           child: Center(
