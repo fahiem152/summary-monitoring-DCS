@@ -293,7 +293,7 @@ class _MonitoringSMState extends State<MonitoringSM> {
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    'Stock Opname Finish Good',
+                                    'Supplier Monitoring Material',
                                     style: textOpenSans.copyWith(
                                       color: blackColor,
                                       fontSize: 14,
@@ -319,7 +319,8 @@ class _MonitoringSMState extends State<MonitoringSM> {
                                             AssetImage(
                                                 'assets/icons/arrow-down.png'),
                                           ),
-                                          dropdownColor: Color(0xffF0F1F2),
+                                          dropdownColor:
+                                              const Color(0xffF0F1F2),
                                           borderRadius:
                                               BorderRadius.circular(15),
                                           hint: const Text('Supplier'),
