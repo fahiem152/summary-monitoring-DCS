@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,13 +6,14 @@ import 'package:intl/intl.dart';
 import 'package:monitoring_mobile/models/mivo_model.dart';
 import 'package:monitoring_mobile/models/rak_model.dart';
 import 'package:monitoring_mobile/services/mivo_service.dart';
-import 'package:http/http.dart' as http;
 import 'package:monitoring_mobile/theme.dart';
 import 'package:monitoring_mobile/widgets/dashline.dart';
 import 'package:monitoring_mobile/widgets/fl_chart/indicator.dart';
 import 'package:monitoring_mobile/widgets/indicators_widget.dart';
 import 'package:monitoring_mobile/widgets/pie_chart_sections.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+
+import '../../helper/user_info.dart';
 
 class MaterialInVSOut extends StatefulWidget {
   const MaterialInVSOut({Key? key}) : super(key: key);
@@ -26,52 +25,60 @@ class MaterialInVSOut extends StatefulWidget {
 class _MaterialInVSOutState extends State<MaterialInVSOut> {
   int touchedIndex = -1;
   bool loading = true;
-  late Future<MonRak> futureMonRak;
   DateTime? _dateTime;
   String slcTypeRak = "racktypem";
   String slcAdressRak = "address1";
-  List<DataRak> stock = [];
-  List<DataMivo> dataList = [];
+  late MonRak _monrak;
+  late List<DataMivo> _dataMivo;
+  late List<DataRak> _dataRak;
   double size = 22;
 
   @override
   void initState() {
-    // getResponse();
-    getDataSupplier();
-    getDataMivo();
-    futureMonRak = getMonRak();
+    _monrak = MonRak(
+      status: false,
+      available: 0,
+      used: 0,
+      data: [],
+      jmlhsupplier: 0,
+    );
+    _getMonRak();
+    _dataRak = [];
+    _getDataSupplier();
+    _dataMivo = [];
+    _getDataMivo();
     super.initState();
   }
 
-  void getDataMivo() async {
-    var response = await http.get(
-      Uri.parse(
-        "https://638b684b7220b45d228f4fe9.mockapi.io/api/stechoq/mat-invsout",
-      ),
-    );
-    List data = json.decode(response.body)['data'];
-    print(json.decode(response.body)['data']);
-    setState(() {
-      //memasukan data json ke dalam model
-      dataList = stockModelFromJson(data);
-      loading = false;
-    });
+  _getDataMivo() async {
+    String token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmlzcCI6IjEyMzQ1Iiwicm9sZV9pZCI6MSwiaWF0IjoxNjcxNTA5ODU5LCJleHAiOjE2NzE1Mzg2NTl9.vTrijhIosfJBOmRi2nc0U_IrFLk88Qcpa50uDx_6wog";
+    _dataMivo = await ServiceMivo.getDataMivo(token);
+    if (mounted) {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
-  void getDataSupplier() async {
-    var response = await http.get(
-      Uri.parse(
-        "https://638b684b7220b45d228f4fe9.mockapi.io/api/stechoq/monitoring-rak",
-      ),
-    );
-    List data = json.decode(response.body)['data'];
-    print(json.decode(response.body)['data']);
+  _getDataSupplier() async {
+    String token = await getToken();
+    _dataRak = await ServiceMivo.getSuplier();
+    if (mounted) {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
 
-    setState(() {
-      //memasukan data json ke dalam model
-      stock = dataRakModelFromJson(data);
-      loading = false;
-    });
+  _getMonRak() async {
+    String token = await getToken();
+    _monrak = await ServiceMivo.getMonRak();
+    if (mounted) {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   List<DropdownMenuItem<String>> get typeRak {
@@ -94,7 +101,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
     return [
       //charts.Series memiliki 4 paramter wajib
       charts.Series<DataRak, String>(
-        data: stock,
+        data: _dataRak,
         id: 'id',
         seriesColor: charts.ColorUtil.fromDartColor(primaryColor),
         domainFn: (DataRak stockFGModel, _) => stockFGModel.suplier,
@@ -139,7 +146,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                               child: Row(
                                 children: [
                                   Text(
-                                    "Pie Chart Material In VS Out",
+                                    "Pie Chart Batch Material In VS Out",
                                     style: textOpenSans.copyWith(
                                       fontSize: 14,
                                       fontWeight: bold,
@@ -164,7 +171,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                     child: Container(
                                       margin: const EdgeInsets.symmetric(
                                           horizontal: 2),
-                                      width: 140,
+                                      width: 145,
                                       height: 30,
                                       decoration: BoxDecoration(
                                         border: Border.all(color: primaryColor),
@@ -282,11 +289,80 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                   : Column(
                       children: [
                         const SizedBox(height: 8),
-                        Text(
-                          "Pie Chart Batch Material In VS Out",
-                          style: textOpenSans.copyWith(
-                            fontSize: 14,
-                            fontWeight: bold,
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              Text(
+                                "Pie Chart Material In VS Out",
+                                style: textOpenSans.copyWith(
+                                  fontSize: 14,
+                                  fontWeight: bold,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              InkWell(
+                                borderRadius: BorderRadius.circular(8),
+                                onTap: () {
+                                  showDatePicker(
+                                    context: context,
+                                    initialDate: DateTime(2021),
+                                    firstDate: DateTime(2021),
+                                    lastDate: DateTime.now(),
+                                  ).then((date) {
+                                    setState(() {
+                                      _dateTime = date;
+                                      print(_dateTime);
+                                    });
+                                  });
+                                },
+                                child: Container(
+                                  margin:
+                                      const EdgeInsets.symmetric(horizontal: 2),
+                                  width: 145,
+                                  height: 30,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: primaryColor),
+                                    color: whiteColor,
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(8),
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.calendar_month,
+                                          color: primaryColor,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          _dateTime == null
+                                              ? DateFormat("yMd", "id")
+                                                  .format(DateTime.now())
+                                              : DateFormat("yMd", "id")
+                                                  .format(_dateTime!),
+                                          style: textOpenSans.copyWith(
+                                            fontWeight: regular,
+                                          ),
+                                        ),
+                                        const Icon(
+                                          CupertinoIcons.chevron_down,
+                                          color: Colors.black87,
+                                          size: 17,
+                                        )
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         const Padding(
@@ -330,6 +406,9 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                     centerSpaceRadius: 0,
                                     sections: showingSections(touchedIndex),
                                   ),
+                                  swapAnimationDuration: const Duration(
+                                      milliseconds: 150), // Optional
+                                  swapAnimationCurve: Curves.linear,
                                 ),
                               ),
                             ),
@@ -341,7 +420,8 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                 children: <Widget>[
                                   Indicator(
                                     color: const Color(0xff63E758),
-                                    value: "${dataList[0].datumIn} Kg",
+                                    value:
+                                        "${_dataMivo.isNotEmpty ? _dataMivo[0].materialIn : 0} Kg",
                                     text: 'In',
                                     isSquare: false,
                                     size: touchedIndex == 0 ? 18 : 16,
@@ -351,7 +431,8 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                   ),
                                   Indicator(
                                     color: const Color(0xff165BAA),
-                                    value: '${dataList[0].out} Kg',
+                                    value:
+                                        '${_dataMivo.isNotEmpty ? _dataMivo[0].materialOut : 0} Kg',
                                     text: 'Out',
                                     isSquare: false,
                                     size: touchedIndex == 1 ? 18 : 16,
@@ -359,16 +440,17 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                         ? Colors.black
                                         : blackColor,
                                   ),
-                                  Indicator(
-                                    color: const Color(0xffF765A3),
-                                    value: '${dataList[0].stock} Kg',
-                                    text: 'Stock',
-                                    isSquare: false,
-                                    size: touchedIndex == 2 ? 18 : 16,
-                                    textColor: touchedIndex == 2
-                                        ? Colors.black
-                                        : blackColor,
-                                  ),
+                                  // Indicator(
+                                  //   color: const Color(0xffF765A3),
+                                  //   value:
+                                  //       '${_dataMivo.isNotEmpty ? _dataMivo[0].stock : 0} Kg',
+                                  //   text: 'Stock',
+                                  //   isSquare: false,
+                                  //   size: touchedIndex == 2 ? 18 : 16,
+                                  //   textColor: touchedIndex == 2
+                                  //       ? Colors.black
+                                  //       : blackColor,
+                                  // ),
                                 ],
                               ),
                             ),
@@ -406,7 +488,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                             child: Row(
                               children: [
                                 Text(
-                                  "Chart Monitoring  Rak",
+                                  "Chart Monitoring Rak",
                                   style: textOpenSans.copyWith(
                                     fontSize: 14,
                                     fontWeight: bold,
@@ -512,121 +594,111 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                   ),
                                 ),
                               ),
-                              FutureBuilder<MonRak>(
-                                  future: futureMonRak,
-                                  builder: ((context, snapshot) {
-                                    if (snapshot.hasData) {
-                                      return Padding(
-                                        padding: const EdgeInsets.only(
-                                          bottom: 16,
-                                          left: 16,
-                                          right: 16,
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: 16,
+                                  left: 16,
+                                  right: 16,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      width: size,
+                                      height: size,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Color(0xff5E72E4),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Used",
+                                          style: textOpenSans.copyWith(
+                                            fontWeight: semiBold,
+                                            fontSize: 14,
+                                          ),
                                         ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Container(
-                                              width: size,
-                                              height: size,
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Color(0xff5E72E4),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Used",
-                                                  style: textOpenSans.copyWith(
-                                                    fontWeight: semiBold,
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  "${snapshot.data!.used.toString()} Kg",
-                                                  style: textOpenSans.copyWith(
-                                                    fontSize: 14,
-                                                    fontWeight: regular,
-                                                    color: blackColor,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Container(
-                                              width: size,
-                                              height: size,
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Color(0xff63E758),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Available",
-                                                  style: textOpenSans.copyWith(
-                                                    fontWeight: semiBold,
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  snapshot.data!.available
-                                                      .toString(),
-                                                  style: textOpenSans.copyWith(
-                                                    fontSize: 14,
-                                                    fontWeight: regular,
-                                                    color: blackColor,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Container(
-                                              width: size,
-                                              height: size,
-                                              decoration: const BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Color(0xffFB6340),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 10),
-                                            Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Supplier",
-                                                  style: textOpenSans.copyWith(
-                                                    fontWeight: semiBold,
-                                                    fontSize: 14,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  snapshot.data!.jmlhsupplier
-                                                      .toString(),
-                                                  style: textOpenSans.copyWith(
-                                                    fontSize: 14,
-                                                    fontWeight: regular,
-                                                    color: blackColor,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ],
+                                        Text(
+                                          "${_monrak.used.toString()} Kg",
+                                          style: textOpenSans.copyWith(
+                                            fontSize: 14,
+                                            fontWeight: regular,
+                                            color: blackColor,
+                                          ),
                                         ),
-                                      );
-                                    } else {
-                                      return Text('${snapshot.error}');
-                                    }
-                                  })),
+                                      ],
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Container(
+                                      width: size,
+                                      height: size,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Color(0xff63E758),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Available",
+                                          style: textOpenSans.copyWith(
+                                            fontWeight: semiBold,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Text(
+                                          _monrak.available.toString(),
+                                          style: textOpenSans.copyWith(
+                                            fontSize: 14,
+                                            fontWeight: regular,
+                                            color: blackColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Container(
+                                      width: size,
+                                      height: size,
+                                      decoration: const BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Color(0xffFB6340),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "Supplier",
+                                          style: textOpenSans.copyWith(
+                                            fontWeight: semiBold,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Text(
+                                          _monrak.jmlhsupplier.toString(),
+                                          style: textOpenSans.copyWith(
+                                            fontSize: 14,
+                                            fontWeight: regular,
+                                            color: blackColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -641,7 +713,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
 
   List<PieChartSectionData> showingSections(int touchedIndex) {
     return List.generate(
-      3,
+      2,
       (i) {
         final isTouched = i == touchedIndex;
         // final opacity = isTouched ? 1.0 : 0.6;
@@ -650,14 +722,17 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
 
         const color0 = Color(0xff63E758);
         const color1 = Color(0xff165BAA);
-        const color2 = Color(0xffF765A3);
+        // const color2 = Color(0xffF765A3);
 
         switch (i) {
           case 0:
             return PieChartSectionData(
               color: color0,
-              value: dataList[0].datumIn.toDouble(),
-              title: dataList[0].datumIn.toString(),
+              value:
+                  _dataMivo.isNotEmpty ? _dataMivo[0].materialIn.toDouble() : 0,
+              title: _dataMivo.isNotEmpty
+                  ? _dataMivo[0].materialOut.toString()
+                  : 0.toString(),
               radius: radius,
               titleStyle: TextStyle(
                 fontSize: fontSize,
@@ -669,8 +744,11 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
           case 1:
             return PieChartSectionData(
               color: color1,
-              value: dataList[0].out.toDouble(),
-              title: dataList[0].out.toString(),
+              value:
+                  _dataMivo.isNotEmpty ? _dataMivo[0].materialIn.toDouble() : 0,
+              title: _dataMivo.isNotEmpty
+                  ? _dataMivo[0].materialOut.toString()
+                  : toString(),
               radius: radius,
               titleStyle: TextStyle(
                 fontSize: fontSize,
@@ -679,22 +757,24 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
               ),
               titlePositionPercentageOffset: 0.55,
             );
-          case 2:
-            return PieChartSectionData(
-              // color: color2.withOpacity(opacity),
-              color: color2,
-              value: dataList[0].stock.toDouble(),
-              title: dataList[0].stock.toString(),
-              radius: radius,
-              titleStyle: TextStyle(
-                fontSize: fontSize,
-                fontWeight: FontWeight.bold,
-                color: whiteColor,
-              ),
-              titlePositionPercentageOffset: 0.6,
-            );
+          // case 2:
+          //   return PieChartSectionData(
+          //     // color: color2.withOpacity(opacity),
+          //     color: color2,
+          //     value: _dataMivo.isNotEmpty ? _dataMivo[0].stock.toDouble() : 0,
+          //     title: _dataMivo.isNotEmpty
+          //         ? _dataMivo[0].stock.toString()
+          //         : 0.toString(),
+          //     radius: radius,
+          //     titleStyle: TextStyle(
+          //       fontSize: fontSize,
+          //       fontWeight: FontWeight.bold,
+          //       color: whiteColor,
+          //     ),
+          //     titlePositionPercentageOffset: 0.6,
+          //   );
           default:
-            throw const CircularProgressIndicator();
+            throw Exception('Error Pie Chart');
         }
       },
     );
