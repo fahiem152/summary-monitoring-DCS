@@ -365,38 +365,60 @@ class _MonitoringSMState extends State<MonitoringSM> {
                             child: CircularProgressIndicator(
                               color: primaryColor,
                             ),
-                          ),
-                        )
-                      : Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Stock Opname Finish Good',
-                                  style: textOpenSans.copyWith(
-                                    color: blackColor,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w700,
+                          )
+                        : Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Supplier Monitoring Material',
+                                    style: textOpenSans.copyWith(
+                                      color: blackColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(
-                                  width: 10,
-                                ),
-                                Container(
-                                  height: 40,
-                                  width: 110,
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          color: primaryColor, width: 1.0),
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: DropdownButtonHideUnderline(
-                                      child: DropdownButton(
-                                        icon: const ImageIcon(
-                                          AssetImage(
-                                              'assets/icons/arrow-down.png'),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Container(
+                                    height: 40,
+                                    width: 110,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: primaryColor, width: 1.0),
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: DropdownButtonHideUnderline(
+                                        child: DropdownButton(
+                                          icon: const ImageIcon(
+                                            AssetImage(
+                                                'assets/icons/arrow-down.png'),
+                                          ),
+                                          dropdownColor:
+                                              const Color(0xffF0F1F2),
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          hint: const Text('Supplier'),
+                                          items: suplierlist.map((item) {
+                                            return DropdownMenuItem(
+                                              value:
+                                                  item['name_sup'].toString(),
+                                              child: Text(
+                                                  item['name_sup'].toString()),
+                                            );
+                                          }).toList(),
+                                          onChanged: (newVal) {
+                                            setState(() {
+                                              valueSuplier = newVal;
+                                              print(valueSuplier);
+                                            });
+                                          },
+                                          value: valueSuplier,
                                         ),
                                         dropdownColor: Color(0xffF0F1F2),
                                         borderRadius: BorderRadius.circular(15),
