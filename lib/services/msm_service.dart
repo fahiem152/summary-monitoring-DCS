@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../constan.dart';
+import '../helper/user_info.dart';
 import '../models/api_response_model.dart';
 import 'package:http/http.dart' as http;
 
@@ -9,19 +10,17 @@ import '../models/msm_model.dart';
 Future<ApiResponse> getTabelMontoringMaterial() async {
   ApiResponse apiResponse = ApiResponse();
   try {
-    // String token = await getToken();
-    final response = await http.get(
-        Uri.parse(
-            "https://638b684b7220b45d228f4fe9.mockapi.io/api/stechoq/table-material"),
-        headers: {
-          'Accept': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          // 'Authorization': 'Bearer $token'
-        });
+    String token = await getToken();
+    final response =
+        await http.get(Uri.parse(baseURL + '/api/mstocks/minmax'), headers: {
+      'Accept': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest',
+      'Authorization': 'Bearer $token'
+    });
     switch (response.statusCode) {
       case 200:
         // print(response.body);
-        apiResponse.data = jsonDecode(response.body)['data']
+        apiResponse.data = jsonDecode(response.body)['list']['data']
             .map((p) => MsmModel.fromJson(p))
             .toList();
         apiResponse.data as List<dynamic>;

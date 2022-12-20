@@ -30,10 +30,18 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  removePred() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.remove("role");
+    preferences.remove("firstName");
+    preferences.remove("lastName");
+    preferences.commit();
+  }
+
   @override
   void initState() {
     super.initState();
-    getPref();
+    // getPref();
   }
 
   @override
@@ -51,13 +59,36 @@ class _HomePageState extends State<HomePage> {
                 elevation: 0,
                 backgroundColor: whiteColor,
                 automaticallyImplyLeading: false,
-                title: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Row(
-                    children: [
-                      Image.asset(
-                        "assets/images/logo_home.png",
-                        width: 50,
+                title: Row(
+                  children: [
+                    Image.asset(
+                      "assets/images/img_profile.png",
+                      width: 50,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            // firstName == ''
+                            //     ? 'Waiting'
+                            //     : firstName + ' ' + lastName,
+                            "Admin",
+                            style: blackTextStyle.copyWith(
+                              fontWeight: semiBold,
+                              fontSize: 24,
+                            ),
+                          ),
+                          Text(
+                            // role == '' ? 'Waiting' : role,
+                            'Manager / BOD',
+                            style: blackTextStyle.copyWith(
+                              fontWeight: regular,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -71,14 +102,28 @@ class _HomePageState extends State<HomePage> {
                                 fontSize: 18,
                               ),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              role == '' ? 'Waiting' : role,
-                              style: blackTextStyle.copyWith(
-                                fontWeight: regular,
-                                fontSize: 14,
+                            DialogButton(
+                              color: Colors.red,
+                              child: const Text(
+                                "Yes",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
                               ),
-                            ),
+                              onPressed: () {
+                                setState(() {
+                                  removePred();
+                                });
+                                logout().then(
+                                  (value) => Navigator.of(context)
+                                      .pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const GetStartedPage()),
+                                          (route) => false),
+                                );
+                              },
+                              width: 120,
+                            )
                           ],
                         ),
                       ),

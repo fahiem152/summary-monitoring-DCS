@@ -3,14 +3,15 @@ import 'dart:convert';
 import 'package:monitoring_mobile/models/api_response_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:monitoring_mobile/models/user_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constan.dart';
 
-String apiLogin = 'https://dummyjson.com/auth/login';
+String apiLogin = baseURL + '/api/login';
 
 Future<ApiResponse> login(
-    {required String username, required String password}) async {
+    {required String nisp,
+    required String password,
+    required int roleId}) async {
   ApiResponse apiResponse = ApiResponse();
   try {
     final response = await http.post(
@@ -19,17 +20,24 @@ Future<ApiResponse> login(
         'Content-Type': 'application/json',
       },
       body: jsonEncode(
-        {"username": username, "password": password},
+        {
+          "nisp": nisp,
+          "password": password,
+          "role_id": roleId,
+        },
       ),
-    );  
+    );
     switch (response.statusCode) {
       case 200:
         print(response.body);
-        apiResponse.data = UserModel.fromJson(jsonDecode(response.body));
+        apiResponse.data =
+            UserModel.fromJson(jsonDecode(response.body)['data']);
         break;
-      case 422:
-        final errors = jsonDecode(response.body)['data']['errors'];
-        apiResponse.error = errors[errors.keys.elementAt(0)][0];
+      case 401:
+        apiResponse.error = jsonDecode(response.body)['error'];
+        break;
+      case 404:
+        apiResponse.error = jsonDecode(response.body)['error'];
         break;
       case 400:
         apiResponse.error = jsonDecode(response.body)['message'];
