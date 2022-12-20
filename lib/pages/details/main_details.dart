@@ -37,7 +37,7 @@ class _DetailHomePageState extends State<DetailHomePage> {
         title: Text(
           widget.listBodyHome.title,
           style: blackTextStyle.copyWith(
-            fontSize: 18,
+            fontSize: 16,
             fontWeight: semiBold,
           ),
         ),
