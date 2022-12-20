@@ -51,82 +51,84 @@ class _HomePageState extends State<HomePage> {
                 elevation: 0,
                 backgroundColor: whiteColor,
                 automaticallyImplyLeading: false,
-                title: Row(
-                  children: [
-                    Image.asset(
-                      "assets/images/img_profile.png",
-                      width: 50,
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            firstName == ''
-                                ? 'Waiting'
-                                : firstName + ' ' + lastName,
-                            style: blackTextStyle.copyWith(
-                              fontWeight: semiBold,
-                              fontSize: 24,
-                            ),
-                          ),
-                          Text(
-                            role == '' ? 'Waiting' : role,
-                            style: blackTextStyle.copyWith(
-                              fontWeight: regular,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
+                title: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Row(
+                    children: [
+                      Image.asset(
+                        "assets/images/logo_home.png",
+                        width: 50,
                       ),
-                    ),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Alert(
-                          context: context,
-                          type: AlertType.warning,
-                          title: "DCS Production",
-                          desc: "Do you want logout ?",
-                          buttons: [
-                            DialogButton(
-                              child: const Text(
-                                "Cencel",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 20),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "DCS Production",
+                              style: blackTextStyle.copyWith(
+                                fontWeight: semiBold,
+                                fontSize: 18,
                               ),
-                              onPressed: () => Navigator.pop(context),
-                              width: 120,
                             ),
-                            DialogButton(
-                              color: Colors.red,
-                              child: const Text(
-                                "Yes",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 20),
+                            const SizedBox(height: 2),
+                            Text(
+                              role == '' ? 'Waiting' : role,
+                              style: blackTextStyle.copyWith(
+                                fontWeight: regular,
+                                fontSize: 14,
                               ),
-                              onPressed: () => logout().then(
-                                (value) => Navigator.of(context)
-                                    .pushAndRemoveUntil(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const GetStartedPage()),
-                                        (route) => false),
-                              ),
-                              width: 120,
-                            )
+                            ),
                           ],
-                        ).show();
-                      },
-                      child: Image.asset(
-                        "assets/images/btn_logout.png",
-                        width: 20,
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          Alert(
+                            context: context,
+                            type: AlertType.warning,
+                            title: "DCS Production",
+                            desc: "Do you want logout ?",
+                            buttons: [
+                              DialogButton(
+                                child: const Text(
+                                  "Cencel",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                                onPressed: () => Navigator.pop(context),
+                                width: 120,
+                              ),
+                              DialogButton(
+                                color: Colors.red,
+                                child: const Text(
+                                  "Yes",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                                onPressed: () => logout().then(
+                                  (value) => Navigator.of(context)
+                                      .pushAndRemoveUntil(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const GetStartedPage()),
+                                          (route) => false),
+                                ),
+                                width: 120,
+                              )
+                            ],
+                          ).show();
+                        },
+                        child: Image.asset(
+                          "assets/images/btn_logout.png",
+                          width: 20,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
