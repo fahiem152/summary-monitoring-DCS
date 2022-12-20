@@ -25,9 +25,9 @@ class _SumNGPartState extends State<SumNGPart> {
     blueColor,
     purpleColor,
     pinkColor,
-    Colors.amber,
-    Colors.red,
-    Colors.green,
+    Colors.redAccent,
+    Colors.amberAccent,
+    Colors.greenAccent,
   ];
   bool loading = true;
   void getDataNG() async {
@@ -36,7 +36,7 @@ class _SumNGPartState extends State<SumNGPart> {
         baseURL + "/api/stechoq/summary-ngp",
       ),
     );
-    List dataStock = json.decode(response.body);
+    List dataStock = json.decode(response.body)["data"];
     print(json.decode(response.body));
     // List dataScrap = json.decode(response.body)['scarb_ng'];
     // print(json.decode(response.body));
@@ -51,45 +51,45 @@ class _SumNGPartState extends State<SumNGPart> {
       StackedColumnSeries<StockNGModel, String>(
         dataSource: stock,
         color: blueColor,
-        xValueMapper: (StockNGModel ch, _) => ch.material,
+        xValueMapper: (StockNGModel ch, _) => ch.material_name,
         yValueMapper: (StockNGModel ch, _) =>
-            (ch.scrab_ng.length <= 0) ? 0 : ch.scrab_ng[0].value,
+            (ch.qty_ng.length <= 0) ? 0 : ch.qty_ng[0].total,
         // (ch.scrab_ng.length < 0) ? 0 : ch.scrab_ng[0].value,
       ),
       StackedColumnSeries<StockNGModel, String>(
         dataSource: stock,
         color: purpleColor,
-        xValueMapper: (StockNGModel ch, _) => ch.material,
+        xValueMapper: (StockNGModel ch, _) => ch.material_name,
         yValueMapper: (StockNGModel ch, _) =>
-            (ch.scrab_ng.length <= 1) ? 0 : ch.scrab_ng[1].value,
+            (ch.qty_ng.length <= 1) ? 0 : ch.qty_ng[1].total,
       ),
       StackedColumnSeries<StockNGModel, String>(
         dataSource: stock,
         color: pinkColor,
-        xValueMapper: (StockNGModel ch, _) => ch.material,
+        xValueMapper: (StockNGModel ch, _) => ch.material_name,
         yValueMapper: (StockNGModel ch, _) =>
-            (ch.scrab_ng.length <= 2) ? 0 : ch.scrab_ng[2].value,
+            (ch.qty_ng.length <= 2) ? 0 : ch.qty_ng[2].total,
       ),
       StackedColumnSeries<StockNGModel, String>(
         dataSource: stock,
-        color: Colors.amber,
-        xValueMapper: (StockNGModel ch, _) => ch.material,
+        color: Colors.redAccent,
+        xValueMapper: (StockNGModel ch, _) => ch.material_name,
         yValueMapper: (StockNGModel ch, _) =>
-            (ch.scrab_ng.length <= 3) ? 0 : ch.scrab_ng[3].value,
+            (ch.qty_ng.length <= 3) ? 0 : ch.qty_ng[3].total,
       ),
       StackedColumnSeries<StockNGModel, String>(
         dataSource: stock,
-        color: Colors.red,
-        xValueMapper: (StockNGModel ch, _) => ch.material,
+        color: Colors.amberAccent,
+        xValueMapper: (StockNGModel ch, _) => ch.material_name,
         yValueMapper: (StockNGModel ch, _) =>
-            (ch.scrab_ng.length <= 4) ? 0 : ch.scrab_ng[4].value,
+            (ch.qty_ng.length <= 4) ? 0 : ch.qty_ng[4].total,
       ),
       StackedColumnSeries<StockNGModel, String>(
         dataSource: stock,
-        color: Colors.green,
-        xValueMapper: (StockNGModel ch, _) => ch.material,
+        color: Colors.greenAccent,
+        xValueMapper: (StockNGModel ch, _) => ch.material_name,
         yValueMapper: (StockNGModel ch, _) =>
-            (ch.scrab_ng.length <= 5) ? 0 : ch.scrab_ng[5].value,
+            (ch.qty_ng.length <= 5) ? 0 : ch.qty_ng[5].total,
       ),
     ];
   }
@@ -144,7 +144,17 @@ class _SumNGPartState extends State<SumNGPart> {
                 columns: <DataColumn>[
                   DataColumn(
                     label: Text(
-                      'Material',
+                      'ID',
+                      style: textOpenSans.copyWith(
+                        fontSize: 13,
+                        fontWeight: regular,
+                        color: whiteColor,
+                      ),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Material ID',
                       style: textOpenSans.copyWith(
                         fontSize: 13,
                         fontWeight: regular,
@@ -164,7 +174,7 @@ class _SumNGPartState extends State<SumNGPart> {
                   ),
                   DataColumn(
                     label: Text(
-                      'Scrap NG',
+                      'Material Name',
                       style: textOpenSans.copyWith(
                         fontSize: 13,
                         fontWeight: regular,
@@ -174,7 +184,7 @@ class _SumNGPartState extends State<SumNGPart> {
                   ),
                   DataColumn(
                     label: Text(
-                      'Quantity Scrab',
+                      'Scarp NG',
                       style: textOpenSans.copyWith(
                         fontSize: 13,
                         fontWeight: regular,
@@ -192,6 +202,16 @@ class _SumNGPartState extends State<SumNGPart> {
                       ),
                     ),
                   ),
+                  DataColumn(
+                    label: Text(
+                      'Total Quantity NG',
+                      style: textOpenSans.copyWith(
+                        fontSize: 13,
+                        fontWeight: regular,
+                        color: whiteColor,
+                      ),
+                    ),
+                  ),
                 ],
                 rows: stock
                     .map(
@@ -200,9 +220,21 @@ class _SumNGPartState extends State<SumNGPart> {
                           DataCell(
                             Center(
                               child: Text(
-                                data.material,
+                                data.id.toString(),
                                 style: textOpenSans.copyWith(
-                                  fontSize: 15,
+                                  fontSize: 13,
+                                  fontWeight: regular,
+                                  color: black5Color,
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Center(
+                              child: Text(
+                                data.material_id.toString(),
+                                style: textOpenSans.copyWith(
+                                  fontSize: 13,
                                   fontWeight: regular,
                                   color: black5Color,
                                 ),
@@ -223,12 +255,24 @@ class _SumNGPartState extends State<SumNGPart> {
                           ),
                           DataCell(
                             Center(
+                              child: Text(
+                                data.material_name,
+                                style: textOpenSans.copyWith(
+                                  fontSize: 13,
+                                  fontWeight: regular,
+                                  color: black5Color,
+                                ),
+                              ),
+                            ),
+                          ),
+                          DataCell(
+                            Center(
                               child: SingleChildScrollView(
                                 scrollDirection: Axis.vertical,
                                 child: Column(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
-                                  children: data.scrab_ng
+                                  children: data.qty_ng
                                       .map(
                                         (e) => Padding(
                                           padding: const EdgeInsets.symmetric(
@@ -241,7 +285,7 @@ class _SumNGPartState extends State<SumNGPart> {
                                               fontWeight: bold,
                                               color:
                                                   colors.map((e) => e).toList()[
-                                                      data.scrab_ng.indexOf(e)],
+                                                      data.qty_ng.indexOf(e)],
                                             ),
                                           ),
                                         ),
@@ -258,13 +302,13 @@ class _SumNGPartState extends State<SumNGPart> {
                                 child: Column(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
-                                  children: data.scrab_ng
+                                  children: data.qty_ng
                                       .map((e) => Padding(
                                             padding: const EdgeInsets.symmetric(
                                               vertical: 4,
                                             ),
                                             child: Text(
-                                              e.value.toString(),
+                                              e.total.toString(),
                                               style: textOpenSans.copyWith(
                                                 fontSize: 15,
                                                 fontWeight: regular,
@@ -280,7 +324,7 @@ class _SumNGPartState extends State<SumNGPart> {
                           DataCell(
                             Center(
                               child: Text(
-                                data.getQuantityNG().toString(),
+                                data.total.toString(),
                                 style: textOpenSans.copyWith(
                                   fontSize: 15,
                                   fontWeight: regular,
@@ -320,7 +364,7 @@ class _SumNGPartState extends State<SumNGPart> {
                         stock.length == 0
                             ? '0'
                             : stock
-                                .map((e) => e.getQuantityNG())
+                                .map((e) => e.total.toInt())
                                 .reduce((value, element) => value + element)
                                 .toString(),
                         style: textOpenSans.copyWith(
@@ -474,7 +518,7 @@ class _SumNGPartState extends State<SumNGPart> {
               //         .toList(),
               //     // children: stock
               //     //     .map((data) => Column(
-              //     //           children: data.scrab_ng
+              //     //           children: data.qty_ng
               //     //               .map(
               //     //                 (e) => Container(
               //     //                   height: 6,
@@ -607,6 +651,9 @@ class _SumNGPartState extends State<SumNGPart> {
               SizedBox(
                 height: 12,
               ),
+              // Row(
+              //     children:
+              //         stock.map((e) => Text(e.created_at.toString())).toList())
             ],
           ),
         )
