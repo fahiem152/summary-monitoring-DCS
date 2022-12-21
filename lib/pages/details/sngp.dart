@@ -3,8 +3,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:monitoring_mobile/constan.dart';
+import 'package:monitoring_mobile/helper/user_info.dart';
 import 'package:monitoring_mobile/models/stock_ng_model.dart';
 import 'package:http/http.dart' as http;
+import 'package:monitoring_mobile/services/sngp_service.dart';
 import 'package:monitoring_mobile/theme.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:intl/intl.dart';
@@ -17,10 +19,9 @@ class SumNGPart extends StatefulWidget {
 }
 
 class _SumNGPartState extends State<SumNGPart> {
-  List<StockNGModel> stock = [];
-
   TextEditingController tanggal = TextEditingController();
   final String datenow = DateFormat('yyyy-MM-dd').format(DateTime.now());
+
   List<Color> colors = [
     blueColor,
     purpleColor,
@@ -29,76 +30,76 @@ class _SumNGPartState extends State<SumNGPart> {
     Colors.amberAccent,
     Colors.greenAccent,
   ];
+  late List<StockNGModel> _dataSngp;
   bool loading = true;
-  void getDataNG() async {
-    var response = await http.get(
-      Uri.parse(
-        baseURL + "/api/stechoq/summary-ngp",
-      ),
-    );
-    List dataStock = json.decode(response.body)["data"];
-    print(json.decode(response.body));
-    // List dataScrap = json.decode(response.body)['scarb_ng'];
-    // print(json.decode(response.body));
-    setState(() {
-      stock = stockModelNGFromJson(dataStock);
-      loading = false;
-    });
+
+  @override
+  void initState() {
+    super.initState();
+    // tanggal.text = '2022-11-06';
+    tanggal.text = datenow;
+    _dataSngp = [];
+    _getDataSngp();
+  }
+
+  _getDataSngp() async {
+    // String token = await getToken();
+    String token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmlzcCI6ImFkbWluIiwicm9sZV9pZCI6MSwiaWF0IjoxNjcxNjM4ODk3LCJleHAiOjE2NzE2Njc2OTd9.KRzWWvHTJPJJ39o-mW3hQQp-eokbv3Itx5utlTPxHLE";
+    _dataSngp = await ServiceSngp.getDataSngp(date: tanggal.text);
+    if (mounted) {
+      setState(() {
+        loading = false;
+      });
+    }
+    print(_dataSngp);
   }
 
   List<ChartSeries<StockNGModel, String>> _dataChart() {
     return [
       StackedColumnSeries<StockNGModel, String>(
-        dataSource: stock,
+        dataSource: _dataSngp,
         color: blueColor,
-        xValueMapper: (StockNGModel ch, _) => ch.material_name,
+        xValueMapper: (StockNGModel ch, _) => ch.part_name,
         yValueMapper: (StockNGModel ch, _) =>
             (ch.qty_ng.length <= 0) ? 0 : ch.qty_ng[0].total,
-        // (ch.scrab_ng.length < 0) ? 0 : ch.scrab_ng[0].value,
       ),
       StackedColumnSeries<StockNGModel, String>(
-        dataSource: stock,
+        dataSource: _dataSngp,
         color: purpleColor,
-        xValueMapper: (StockNGModel ch, _) => ch.material_name,
+        xValueMapper: (StockNGModel ch, _) => ch.part_name,
         yValueMapper: (StockNGModel ch, _) =>
             (ch.qty_ng.length <= 1) ? 0 : ch.qty_ng[1].total,
       ),
       StackedColumnSeries<StockNGModel, String>(
-        dataSource: stock,
+        dataSource: _dataSngp,
         color: pinkColor,
-        xValueMapper: (StockNGModel ch, _) => ch.material_name,
+        xValueMapper: (StockNGModel ch, _) => ch.part_name,
         yValueMapper: (StockNGModel ch, _) =>
             (ch.qty_ng.length <= 2) ? 0 : ch.qty_ng[2].total,
       ),
       StackedColumnSeries<StockNGModel, String>(
-        dataSource: stock,
+        dataSource: _dataSngp,
         color: Colors.redAccent,
-        xValueMapper: (StockNGModel ch, _) => ch.material_name,
+        xValueMapper: (StockNGModel ch, _) => ch.part_name,
         yValueMapper: (StockNGModel ch, _) =>
             (ch.qty_ng.length <= 3) ? 0 : ch.qty_ng[3].total,
       ),
       StackedColumnSeries<StockNGModel, String>(
-        dataSource: stock,
+        dataSource: _dataSngp,
         color: Colors.amberAccent,
-        xValueMapper: (StockNGModel ch, _) => ch.material_name,
+        xValueMapper: (StockNGModel ch, _) => ch.part_name,
         yValueMapper: (StockNGModel ch, _) =>
             (ch.qty_ng.length <= 4) ? 0 : ch.qty_ng[4].total,
       ),
       StackedColumnSeries<StockNGModel, String>(
-        dataSource: stock,
+        dataSource: _dataSngp,
         color: Colors.greenAccent,
-        xValueMapper: (StockNGModel ch, _) => ch.material_name,
+        xValueMapper: (StockNGModel ch, _) => ch.part_name,
         yValueMapper: (StockNGModel ch, _) =>
             (ch.qty_ng.length <= 5) ? 0 : ch.qty_ng[5].total,
       ),
     ];
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    tanggal.text = datenow;
-    getDataNG();
   }
 
   @override
@@ -109,7 +110,7 @@ class _SumNGPartState extends State<SumNGPart> {
         plotAreaBorderColor: white2Color,
         primaryXAxis: CategoryAxis(
           labelStyle: TextStyle(color: black7Color, fontSize: 8),
-          labelRotation: stock.length <= 4 ? 0 : 90,
+          labelRotation: _dataSngp.length <= 4 ? 0 : 90,
           isVisible: true,
           isInversed: false,
           plotOffset: 0,
@@ -144,7 +145,7 @@ class _SumNGPartState extends State<SumNGPart> {
                 columns: <DataColumn>[
                   DataColumn(
                     label: Text(
-                      'ID',
+                      'Part Name',
                       style: textOpenSans.copyWith(
                         fontSize: 13,
                         fontWeight: regular,
@@ -154,27 +155,7 @@ class _SumNGPartState extends State<SumNGPart> {
                   ),
                   DataColumn(
                     label: Text(
-                      'Material ID',
-                      style: textOpenSans.copyWith(
-                        fontSize: 13,
-                        fontWeight: regular,
-                        color: whiteColor,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'Material Number',
-                      style: textOpenSans.copyWith(
-                        fontSize: 13,
-                        fontWeight: regular,
-                        color: whiteColor,
-                      ),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'Material Name',
+                      'Part Number',
                       style: textOpenSans.copyWith(
                         fontSize: 13,
                         fontWeight: regular,
@@ -213,14 +194,14 @@ class _SumNGPartState extends State<SumNGPart> {
                     ),
                   ),
                 ],
-                rows: stock
+                rows: _dataSngp
                     .map(
                       (data) => DataRow(
                         cells: [
                           DataCell(
                             Center(
                               child: Text(
-                                data.id.toString(),
+                                data.part_name,
                                 style: textOpenSans.copyWith(
                                   fontSize: 13,
                                   fontWeight: regular,
@@ -232,31 +213,7 @@ class _SumNGPartState extends State<SumNGPart> {
                           DataCell(
                             Center(
                               child: Text(
-                                data.material_id.toString(),
-                                style: textOpenSans.copyWith(
-                                  fontSize: 13,
-                                  fontWeight: regular,
-                                  color: black5Color,
-                                ),
-                              ),
-                            ),
-                          ),
-                          DataCell(
-                            Center(
-                              child: Text(
-                                data.material_number,
-                                style: textOpenSans.copyWith(
-                                  fontSize: 13,
-                                  fontWeight: regular,
-                                  color: black5Color,
-                                ),
-                              ),
-                            ),
-                          ),
-                          DataCell(
-                            Center(
-                              child: Text(
-                                data.material_name,
+                                data.part_number,
                                 style: textOpenSans.copyWith(
                                   fontSize: 13,
                                   fontWeight: regular,
@@ -347,7 +304,7 @@ class _SumNGPartState extends State<SumNGPart> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Total',
+                        'All Total',
                         style: textOpenSans.copyWith(
                           fontSize: 15,
                           fontWeight: regular,
@@ -361,9 +318,9 @@ class _SumNGPartState extends State<SumNGPart> {
                     width: MediaQuery.of(context).size.width * 0.315,
                     child: Center(
                       child: Text(
-                        stock.length == 0
+                        _dataSngp.length == 0
                             ? '0'
-                            : stock
+                            : _dataSngp
                                 .map((e) => e.total.toInt())
                                 .reduce((value, element) => value + element)
                                 .toString(),
@@ -430,10 +387,12 @@ class _SumNGPartState extends State<SumNGPart> {
                         if (pickedDate2 != null) {
                           String formattedDate2 =
                               DateFormat('yyyy-MM-dd').format(pickedDate2);
+
                           print(formattedDate2);
                           setState(
                             () {
                               tanggal.text = formattedDate2;
+                              _getDataSngp();
                             },
                           );
                         } else {
@@ -493,106 +452,14 @@ class _SumNGPartState extends State<SumNGPart> {
                   ),
                 ),
               ),
-              getChartStackedSummaryNG(),
-              // Padding(
-              //   padding: const EdgeInsets.all(
-              //     12,
-              //   ),
-              //   child: Wrap(
-              //     spacing: 8,
-              //     runSpacing: 8,
-              //     children: stock
-              //         .map((e) => Column(
-              //               children: [
-              //                 Container(
-              //                   height: 8,
-              //                   width: 20,
-              //                   color: colors[stock.indexOf(e)],
-              //                 ),
-              //                 Text(
-              //                   'Data' + stock.indexOf(e).toString(),
-              //                 ),
-              //                 // Text("Data" + stock.indexOf(e).toString()),
-              //               ],
-              //             ))
-              //         .toList(),
-              //     // children: stock
-              //     //     .map((data) => Column(
-              //     //           children: data.qty_ng
-              //     //               .map(
-              //     //                 (e) => Container(
-              //     //                   height: 6,
-              //     //                   width: 20,
-              //     //                   color: colors[stock.indexOf(data)],
-              //     //                 ),
-              //     //               )
-              //     //               .toList(),
-              //     //         ))
-              //     //     .toList(),
-              //     // children: [
-              //     //   Column(
-              //     //     children: [
-              //     //       Container(
-              //     //         height: 8,
-              //     //         width: 20,
-              //     //         color: blueColor,
-              //     //       ),
-              //     //       SizedBox(
-              //     //         height: 4,
-              //     //       ),
-              //     //       Text(
-              //     //         'Data 1',
-              //     //         style: textInter.copyWith(
-              //     //           fontSize: 10,
-              //     //           fontWeight: regular,
-              //     //           color: black7Color,
-              //     //         ),
-              //     //       ),
-              //     //     ],
-              //     //   ),
-              //     //   Column(
-              //     //     children: [
-              //     //       Container(
-              //     //         height: 8,
-              //     //         width: 20,
-              //     //         color: purpleColor,
-              //     //       ),
-              //     //       SizedBox(
-              //     //         height: 4,
-              //     //       ),
-              //     //       Text(
-              //     //         'Data 2',
-              //     //         style: textInter.copyWith(
-              //     //           fontSize: 10,
-              //     //           fontWeight: regular,
-              //     //           color: black7Color,
-              //     //         ),
-              //     //       ),
-              //     //     ],
-              //     //   ),
-              //     //   Column(
-              //     //     children: [
-              //     //       Container(
-              //     //         height: 8,
-              //     //         width: 20,
-              //     //         color: pinkColor,
-              //     //       ),
-              //     //       SizedBox(
-              //     //         height: 4,
-              //     //       ),
-              //     //       Text(
-              //     //         'Data 3',
-              //     //         style: textInter.copyWith(
-              //     //           fontSize: 10,
-              //     //           fontWeight: regular,
-              //     //           color: black7Color,
-              //     //         ),
-              //     //       ),
-              //     //     ],
-              //     //   )
-              //     // ],
-              //   ),
-              // )
+              _dataSngp.length == 0
+                  ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(defaultMargin),
+                        child: Text("Data pada tanggal ini kosong"),
+                      ),
+                    )
+                  : getChartStackedSummaryNG(),
             ],
           ),
         ),
@@ -622,7 +489,7 @@ class _SumNGPartState extends State<SumNGPart> {
                   16,
                 ),
                 child: Text(
-                  'Table No Good Opname',
+                  'Table No Good Part',
                   style: textOpenSans.copyWith(
                     fontSize: 12,
                     fontWeight: bold,
@@ -644,16 +511,20 @@ class _SumNGPartState extends State<SumNGPart> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: getTableSummaryNG(),
-              ),
+              _dataSngp.length == 0
+                  ? Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(defaultMargin),
+                        child: Text("Data pada tanggal ini kosong"),
+                      ),
+                    )
+                  : Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: getTableSummaryNG(),
+                    ),
               SizedBox(
                 height: 12,
               ),
-              // Row(
-              //     children:
-              //         stock.map((e) => Text(e.created_at.toString())).toList())
             ],
           ),
         )
