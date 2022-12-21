@@ -31,7 +31,7 @@ class _MonitoringSMState extends State<MonitoringSM> {
     String token = await getToken();
     var response = await http.get(
       Uri.parse(
-        baseURL + "/api/material/stocks",
+        baseURL + "/api/mStocks/stocks",
       ),
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
@@ -365,62 +365,39 @@ class _MonitoringSMState extends State<MonitoringSM> {
                             child: CircularProgressIndicator(
                               color: primaryColor,
                             ),
-                          )
-                        : Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Supplier Monitoring Material',
-                                    style: textOpenSans.copyWith(
-                                      color: blackColor,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w700,
-                                    ),
+                          ),
+                        )
+                      : Column(
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  'Supplier Monitoring Material',
+                                  style: textOpenSans.copyWith(
+                                    color: blackColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
                                   ),
-                                  const SizedBox(
-                                    width: 10,
-                                  ),
-                                  Container(
-                                    height: 40,
-                                    width: 110,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(
-                                            color: primaryColor, width: 1.0),
-                                        borderRadius:
-                                            BorderRadius.circular(10)),
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
-                                      child: DropdownButtonHideUnderline(
-                                        child: DropdownButton(
-                                          icon: const ImageIcon(
-                                            AssetImage(
-                                                'assets/icons/arrow-down.png'),
-                                          ),
-                                          dropdownColor:
-                                              const Color(0xffF0F1F2),
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                          hint: const Text('Supplier'),
-                                          items: suplierlist.map((item) {
-                                            return DropdownMenuItem(
-                                              value:
-                                                  item['name_sup'].toString(),
-                                              child: Text(
-                                                  item['name_sup'].toString()),
-                                            );
-                                          }).toList(),
-                                          onChanged: (newVal) {
-                                            setState(() {
-                                              valueSuplier = newVal;
-                                              print(valueSuplier);
-                                            });
-                                          },
-                                          value: valueSuplier,
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Container(
+                                  height: 40,
+                                  width: 110,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          color: primaryColor, width: 1.0),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                        icon: const ImageIcon(
+                                          AssetImage(
+                                              'assets/icons/arrow-down.png'),
                                         ),
-                                        dropdownColor: Color(0xffF0F1F2),
+                                        dropdownColor: const Color(0xffF0F1F2),
                                         borderRadius: BorderRadius.circular(15),
                                         hint: const Text('Supplier'),
                                         items: suplierlist.map((item) {
@@ -569,6 +546,222 @@ class _MonitoringSMState extends State<MonitoringSM> {
                 ),
               ),
             ),
+            // SizedBox(
+            //   height: 500,
+            //   width: MediaQuery.of(context).size.width,
+            //   child: Card(
+            //     child: Padding(
+            //       padding: const EdgeInsets.all(15.0),
+            //       child: _loading
+            //           ? SizedBox(
+            //               height: 400,
+            //               child: Center(
+            //                 child: CircularProgressIndicator(
+            //                   color: primaryColor,
+            //                 ),
+            //               )
+            //             : Column(
+            //                 children: [
+            //                   Row(
+            //                     mainAxisAlignment:
+            //                         MainAxisAlignment.spaceBetween,
+            //                     children: [
+            //                       Text(
+            //                         'Supplier Monitoring Material',
+            //                         style: textOpenSans.copyWith(
+            //                           color: blackColor,
+            //                           fontSize: 14,
+            //                           fontWeight: FontWeight.w700,
+            //                         ),
+            //                       ),
+            //                       const SizedBox(
+            //                         width: 10,
+            //                       ),
+            //                       Container(
+            //                         height: 40,
+            //                         width: 110,
+            //                         decoration: BoxDecoration(
+            //                             border: Border.all(
+            //                                 color: primaryColor, width: 1.0),
+            //                             borderRadius:
+            //                                 BorderRadius.circular(10)),
+            //                         child: Padding(
+            //                           padding: const EdgeInsets.all(8.0),
+            //                           child: DropdownButtonHideUnderline(
+            //                             child: DropdownButton(
+            //                               icon: const ImageIcon(
+            //                                 AssetImage(
+            //                                     'assets/icons/arrow-down.png'),
+            //                               ),
+            //                               dropdownColor:
+            //                                   const Color(0xffF0F1F2),
+            //                               borderRadius:
+            //                                   BorderRadius.circular(15),
+            //                               hint: const Text('Supplier'),
+            //                               items: suplierlist.map((item) {
+            //                                 return DropdownMenuItem(
+            //                                   value:
+            //                                       item['name_sup'].toString(),
+            //                                   child: Text(
+            //                                       item['name_sup'].toString()),
+            //                                 );
+            //                               }).toList(),
+            //                               onChanged: (newVal) {
+            //                                 setState(() {
+            //                                   valueSuplier = newVal;
+            //                                   print(valueSuplier);
+            //                                 });
+            //                               },
+            //                               value: valueSuplier,
+            //                             ),
+            //                             dropdownColor: Color(0xffF0F1F2),
+            //                             borderRadius: BorderRadius.circular(15),
+            //                             hint: const Text('Supplier'),
+            //                             items: suplierlist.map((item) {
+            //                               return DropdownMenuItem(
+            //                                 value: item['name_sup'].toString(),
+            //                                 child: Text(
+            //                                     item['name_sup'].toString()),
+            //                               );
+            //                             }).toList(),
+            //                             onChanged: (newVal) {
+            //                               setState(() {
+            //                                 valueSuplier = newVal;
+            //                                 print(valueSuplier);
+            //                               });
+            //                             },
+            //                             value: valueSuplier,
+            //                           ),
+            //                         ),
+            //                       ),
+            //                   ],
+            //                 ),
+            //                 const SizedBox(
+            //                   height: 20,
+            //                 ),
+            //                 Container(
+            //                   height: 35,
+            //                   width: MediaQuery.of(context).size.width,
+            //                   decoration: BoxDecoration(
+            //                     border:
+            //                         Border.all(width: 1, color: primaryColor),
+            //                   ),
+            //                   child: Padding(
+            //                     padding:
+            //                         const EdgeInsets.symmetric(horizontal: 10),
+            //                     child: Row(
+            //                       mainAxisAlignment:
+            //                           MainAxisAlignment.spaceBetween,
+            //                       children: [
+            //                         Text(
+            //                           'Type',
+            //                           style: textOpenSans.copyWith(
+            //                             color: blackColor,
+            //                             fontSize: 12,
+            //                             fontWeight: FontWeight.w600,
+            //                           ),
+            //                         ),
+            //                         Text(
+            //                           'Min Stock(gr)',
+            //                           style: textOpenSans.copyWith(
+            //                             color: blackColor,
+            //                             fontSize: 12,
+            //                             fontWeight: FontWeight.w600,
+            //                           ),
+            //                         ),
+            //                         Text(
+            //                           'Max Stock(gr)',
+            //                           style: textOpenSans.copyWith(
+            //                             color: blackColor,
+            //                             fontSize: 12,
+            //                             fontWeight: FontWeight.w600,
+            //                           ),
+            //                         ),
+            //                       ],
+            //                     ),
+            //                   ),
+            //                 ),
+            //                 ListView.builder(
+            //                   shrinkWrap: true,
+            //                   physics: const NeverScrollableScrollPhysics(),
+            //                   itemCount: 2,
+            //                   itemBuilder: (context, index) {
+            //                     MsmModel msmModel = tabelStockList[index];
+            //                     return Container(
+            //                       height: 35,
+            //                       width: MediaQuery.of(context).size.width,
+            //                       decoration: BoxDecoration(
+            //                           border: Border(
+            //                         left: BorderSide(
+            //                             width: 1, color: black2Color),
+            //                         right: BorderSide(
+            //                             width: 1, color: black2Color),
+            //                         bottom: BorderSide(
+            //                             width: 1, color: black2Color),
+            //                       )),
+            //                       child: Padding(
+            //                         padding: const EdgeInsets.symmetric(
+            //                             horizontal: 10),
+            //                         child: Row(
+            //                           mainAxisAlignment:
+            //                               MainAxisAlignment.spaceBetween,
+            //                           children: [
+            //                             Text(
+            //                               msmModel.type,
+            //                               style: textOpenSans.copyWith(
+            //                                 color: blackColor,
+            //                                 fontSize: 12,
+            //                                 fontWeight: FontWeight.w600,
+            //                               ),
+            //                             ),
+            //                             Text(
+            //                               msmModel.qtyMin.toString(),
+            //                               style: textOpenSans.copyWith(
+            //                                 color: blackColor,
+            //                                 fontSize: 12,
+            //                                 fontWeight: FontWeight.w600,
+            //                               ),
+            //                             ),
+            //                             Text(
+            //                               msmModel.qtyMax.toString(),
+            //                               style: textOpenSans.copyWith(
+            //                                 color: blackColor,
+            //                                 fontSize: 12,
+            //                                 fontWeight: FontWeight.w600,
+            //                               ),
+            //                             ),
+            //                           ],
+            //                         ),
+            //                       ),
+            //                     );
+            //                   },
+            //                 ),
+            //                 const SizedBox(
+            //                   height: 20,
+            //                 ),
+            //                 Expanded(
+            //                   child: HorizontalDataTable(
+            //                     leftHandSideColumnWidth: 50,
+            //                     rightHandSideColumnWidth: 380,
+            //                     isFixedHeader: true,
+            //                     headerWidgets: _getTitle(),
+            //                     leftSideItemBuilder: _firstColumnRow,
+            //                     rightSideItemBuilder: _rightHandSideColumnRow,
+            //                     itemCount: tabelStockList.length,
+            //                     rowSeparatorWidget: const Divider(
+            //                       color: Colors.black54,
+            //                       height: 1.0,
+            //                       thickness: 0.0,
+            //                     ),
+            //                     // leftHandSideColBackgroundColor: Color(0xFFFFFFFF),
+            //                     // rightHandSideColBackgroundColor: Color(0xFFFFFFFF),
+            //                   ),
+            //                 ),
+            //               ],
+            //             ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
       ),
