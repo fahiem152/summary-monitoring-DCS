@@ -41,7 +41,7 @@ class _StockFGState extends State<StockFG> {
         'Authorization': 'Bearer $token'
       },
     );
-    List data = json.decode(response.body)['list']['data'];
+    List data = json.decode(response.body)['list'];
 
     setState(() {
       //memasukan data json ke dalam model

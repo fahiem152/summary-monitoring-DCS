@@ -10,62 +10,105 @@ List<DataRak> dataRakModelFromJson(List data) => List<DataRak>.from(
       ),
     );
 
+List<Supplier> supplierModelFromJson(List data) => List<Supplier>.from(
+      data.map(
+        (x) => Supplier.fromJson(x),
+      ),
+    );
+
 class MonRak {
   MonRak({
     required this.status,
-    required this.available,
-    required this.used,
-    required this.data,
-    required this.jmlhsupplier,
+    required this.list,
   });
 
   bool status;
-  int available;
-  int used;
-  int jmlhsupplier;
-  List<DataRak> data;
+  ListClass list;
 
   factory MonRak.fromJson(Map<String, dynamic> json) => MonRak(
         status: json["status"],
-        available: json["available"],
-        used: json["used"],
-        jmlhsupplier: json["jmlhsupplier"],
-        data: List<DataRak>.from(json["data"].map((x) => DataRak.fromJson(x))),
+        list: ListClass.fromJson(json["list"]),
       );
 
   Map<String, dynamic> toJson() => {
         "status": status,
-        "available": available,
-        "used": used,
-        "jmlhsupplier": jmlhsupplier,
+        "list": list.toJson(),
+      };
+}
+
+class ListClass {
+  ListClass({
+    required this.data,
+  });
+
+  List<DataRak> data;
+
+  factory ListClass.fromJson(Map<String, dynamic> json) => ListClass(
+        data: List<DataRak>.from(json["data"].map((x) => DataRak.fromJson(x))),
+      );
+
+  Map<String, dynamic> toJson() => {
         "data": List<dynamic>.from(data.map((x) => x.toJson())),
       };
 }
 
 class DataRak {
   DataRak({
-    required this.createdAt,
-    required this.suplier,
-    required this.value,
-    required this.id,
+    required this.type,
+    required this.address,
+    required this.supplier,
+    required this.used,
+    required this.available,
+    required this.totalSupplier,
+    required this.idStock,
   });
 
-  DateTime createdAt;
-  String suplier;
-  int value;
-  String id;
+  int idStock;
+  String type;
+  String address;
+  List<Supplier> supplier;
+  int used;
+  int available;
+  int totalSupplier;
 
   factory DataRak.fromJson(Map<String, dynamic> json) => DataRak(
-        createdAt: DateTime.parse(json["createdAt"]),
-        suplier: json["suplier"],
-        value: json["value"],
-        id: json["id"],
+        type: json["type"],
+        address: json["address"],
+        supplier: List<Supplier>.from(
+            json["supplier"].map((x) => Supplier.fromJson(x))),
+        used: json["Used"],
+        available: json["Available"],
+        totalSupplier: json["Total_Supplier"],
+        idStock: json["id_stock"],
       );
 
   Map<String, dynamic> toJson() => {
-        "createdAt": createdAt.toIso8601String(),
-        "suplier": suplier,
-        "value": value,
-        "id": id,
+        "type": type,
+        "address": address,
+        "supplier": List<dynamic>.from(supplier.map((x) => x.toJson())),
+        "Used": used,
+        "Available": available,
+        "Total_Supplier": totalSupplier,
+        "id": idStock,
+      };
+}
+
+class Supplier {
+  Supplier({
+    required this.namaSupplier,
+    required this.jumlah,
+  });
+
+  String namaSupplier;
+  int jumlah;
+
+  factory Supplier.fromJson(Map<String, dynamic> json) => Supplier(
+        namaSupplier: json["nama_supplier"],
+        jumlah: json["jumlah"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "nama_supplier": namaSupplier,
+        "jumlah": jumlah,
       };
 }
