@@ -18,23 +18,37 @@ class ProdFGInVSOut extends StatefulWidget {
 }
 
 class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
-  DateTime? _dateTime;
   int touchedIndex = -1;
-  // List<DataPfgivo> dataList = []; // list of api data
   late List<DataPfgivo> _dataPfgivo;
+  late List<DataPfgivo> _dataHistory;
   bool loading = true;
+  TextEditingController tanggal = TextEditingController();
+  final String datenow = DateFormat('dd/MM/yyyy').format(DateTime.now());
 
   // this will make state when app runs
   @override
   void initState() {
     _dataPfgivo = [];
+    _dataHistory = [];
     _getPfgivo();
+    _getHistory();
+    tanggal.text = datenow;
     super.initState();
   }
 
-  _getPfgivo() async {
+  void _getPfgivo() async {
     String token = await getToken();
-    _dataPfgivo = await ServicePfgivo.getData(token);
+    _dataPfgivo = await ServicePfgivo.getData(token, date: tanggal.text);
+    if (mounted) {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
+
+  void _getHistory() async {
+    String token = await getToken();
+    _dataHistory = await ServicePfgivo.getHistory(token);
     if (mounted) {
       setState(() {
         loading = false;
@@ -88,18 +102,26 @@ class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
                               ),
                               InkWell(
                                 borderRadius: BorderRadius.circular(8),
-                                onTap: () {
-                                  showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime(2021),
-                                    firstDate: DateTime(2021),
-                                    lastDate: DateTime.now(),
-                                  ).then((date) {
+                                onTap: () async {
+                                  DateTime? pickedDate2 = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2101));
+
+                                  if (pickedDate2 != null) {
+                                    String formattedDate2 =
+                                        DateFormat("yyyy-MM-dd", "id")
+                                            .format(pickedDate2);
+                                    print(formattedDate2);
+
                                     setState(() {
-                                      _dateTime = date;
-                                      print(_dateTime);
+                                      tanggal.text = formattedDate2;
+                                      _getPfgivo();
                                     });
-                                  });
+                                  } else {
+                                    print("Date is not selected");
+                                  }
                                 },
                                 child: Container(
                                   margin:
@@ -127,11 +149,10 @@ class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
                                         ),
                                         const SizedBox(width: 8),
                                         Text(
-                                          _dateTime == null
-                                              ? DateFormat("yMd", "id")
+                                          tanggal.text.isEmpty
+                                              ? DateFormat("yyyy-MM-dd", "id")
                                                   .format(DateTime.now())
-                                              : DateFormat("yMd", "id")
-                                                  .format(_dateTime!),
+                                              : tanggal.text,
                                           style: textOpenSans.copyWith(
                                             fontWeight: regular,
                                           ),
@@ -149,60 +170,139 @@ class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
                             ],
                           ),
                         ),
-                        const DashLineView(
-                          fillRate: 1,
-                        ),
-                        Row(
-                          children: [
-                            const SizedBox(
-                              height: 18,
-                            ),
-                            Expanded(
-                              child: AspectRatio(
-                                aspectRatio: 1.6,
-                                child: PieChart(
-                                  dataMap:
-                                      dataMap, // this need to be map for piechart
-                                  animationDuration:
-                                      const Duration(milliseconds: 800),
-                                  chartLegendSpacing: 32,
-                                  initialAngleInDegree: 0,
-                                  chartType: ChartType.disc,
-                                  ringStrokeWidth: 32,
-                                  legendOptions: const LegendOptions(
-                                    showLegendsInRow: false,
-                                    legendPosition: LegendPosition.right,
-                                    showLegends: true,
-                                  ),
-                                  chartValuesOptions: const ChartValuesOptions(
-                                    showChartValueBackground: true,
-                                    showChartValues: true,
-                                    showChartValuesOutside: false,
-                                    decimalPlaces: 1,
+                        _dataPfgivo.isEmpty
+                            ? SizedBox(
+                                height: 50,
+                                child: Center(
+                                  child: Text(
+                                    "Tidak ada grafik di hari ini",
+                                    style: textOpenSans.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: semiBold,
+                                    ),
                                   ),
                                 ),
+                              )
+                            : Row(
+                                children: [
+                                  const SizedBox(
+                                    height: 18,
+                                  ),
+                                  Expanded(
+                                    child: AspectRatio(
+                                      aspectRatio: 1.6,
+                                      child: PieChart(
+                                        dataMap:
+                                            dataMap, // this need to be map for piechart
+                                        animationDuration:
+                                            const Duration(milliseconds: 800),
+                                        chartLegendSpacing: 32,
+                                        initialAngleInDegree: 0,
+                                        chartType: ChartType.disc,
+                                        ringStrokeWidth: 32,
+                                        legendOptions: const LegendOptions(
+                                          showLegendsInRow: false,
+                                          legendPosition: LegendPosition.right,
+                                          showLegends: true,
+                                        ),
+                                        chartValuesOptions:
+                                            const ChartValuesOptions(
+                                          showChartValueBackground: true,
+                                          showChartValues: true,
+                                          showChartValuesOutside: false,
+                                          decimalPlaces: 1,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 28,
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(
-                              width: 28,
-                            ),
-                          ],
-                        ),
                       ],
                     ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              child: Center(
-                child: Text(
-                  "Last 10 Histori",
-                  style: textOpenSans.copyWith(
-                    fontSize: 14,
-                    fontWeight: bold,
+            _dataPfgivo.isEmpty
+                ? Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        child: Center(
+                          child: Text(
+                            "Last 10 Histori",
+                            style: textOpenSans.copyWith(
+                              fontSize: 14,
+                              fontWeight: bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const DashLineView(
+                        fillRate: 1,
+                      ),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          itemCount: _dataHistory.length,
+                          itemBuilder: ((context, index) {
+                            return Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Text(
+                                              _dataHistory[index]
+                                                  .order
+                                                  .toString(),
+                                              style: textOpenSans.copyWith(
+                                                fontSize: 16,
+                                                fontWeight: bold,
+                                              ),
+                                            ),
+                                            Text(
+                                              " Order",
+                                              style: textOpenSans,
+                                            )
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          "Barang ${_dataHistory[index].idWorkorder}",
+                                          style: textOpenSans,
+                                        ),
+                                      ],
+                                    ),
+                                    Text(
+                                      DateFormat("yMd", "id_ID").format(
+                                          _dataHistory[index].createdAt),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          })),
+                    ],
+                  )
+                : Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    child: Center(
+                      child: Text(
+                        "Last 10 Histori",
+                        style: textOpenSans.copyWith(
+                          fontSize: 14,
+                          fontWeight: bold,
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
             const DashLineView(fillRate: 1),
             ListView.builder(
                 shrinkWrap: true,
