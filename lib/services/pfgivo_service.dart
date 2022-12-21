@@ -2,10 +2,11 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:monitoring_mobile/constan.dart';
 import 'package:monitoring_mobile/models/pfgivo_model.dart';
 
 class ServicePfgivo {
-  static const _baseUrl = 'http://192.168.1.153:8080/api/production/inout';
+  static const _baseUrl = baseURL + '/api/production/inout';
 
   static Future<List<DataPfgivo>> getData(token) async {
     final response = await http.get(

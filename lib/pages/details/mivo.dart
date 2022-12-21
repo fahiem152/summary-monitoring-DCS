@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:monitoring_mobile/models/mivo_model.dart';
 import 'package:monitoring_mobile/models/rak_model.dart';
 import 'package:monitoring_mobile/services/mivo_service.dart';
+import 'package:monitoring_mobile/services/monrak_service.dart';
 import 'package:monitoring_mobile/theme.dart';
 import 'package:monitoring_mobile/widgets/dashline.dart';
 import 'package:monitoring_mobile/widgets/fl_chart/indicator.dart';
@@ -51,8 +52,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
   }
 
   _getDataMivo() async {
-    String token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmlzcCI6IjEyMzQ1Iiwicm9sZV9pZCI6MSwiaWF0IjoxNjcxNTQ2NzQ2LCJleHAiOjE2NzE1NzU1NDZ9.QUi71qQp59wxY8zgbFt5SlgKuZBAZb_W7BZTUufCYDg";
+    String token = await getToken();
     _dataMivo = await ServiceMivo.getDataMivo(token);
     if (mounted) {
       setState(() {
@@ -63,7 +63,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
 
   _getDataSupplier() async {
     String token = await getToken();
-    _dataRak = await ServiceMivo.getSuplier();
+    _dataRak = await ServiceMonrak.getSuplier(token);
     if (mounted) {
       setState(() {
         loading = false;
@@ -73,7 +73,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
 
   _getMonRak() async {
     String token = await getToken();
-    _monrak = await ServiceMivo.getMonRak();
+    _monrak = await ServiceMonrak.getMonRak(token);
     if (mounted) {
       setState(() {
         loading = false;
