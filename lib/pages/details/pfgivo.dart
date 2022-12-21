@@ -2,11 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:monitoring_mobile/helper/user_info.dart';
 import 'package:monitoring_mobile/models/pfgivo_model.dart';
+import 'package:monitoring_mobile/services/pfgivo_service.dart';
 import 'package:monitoring_mobile/theme.dart';
 import 'package:monitoring_mobile/widgets/dashline.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 import 'package:pie_chart/pie_chart.dart';
 
@@ -20,29 +20,28 @@ class ProdFGInVSOut extends StatefulWidget {
 class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
   DateTime? _dateTime;
   int touchedIndex = -1;
-  List<DataPfgivo> dataList = []; // list of api data
+  // List<DataPfgivo> dataList = []; // list of api data
+  late List<DataPfgivo> _dataPfgivo;
   bool loading = true;
-
-  getResponse() async {
-    var response = await http.get(
-      Uri.parse(
-        "https://638b684b7220b45d228f4fe9.mockapi.io/api/stechoq/fg-invsout",
-      ),
-    );
-    List data = json.decode(response.body)['data'];
-    print(json.decode(response.body)['data']);
-    setState(() {
-      //memasukan data json ke dalam model
-      dataList = pfgivoModelFromJson(data);
-      loading = false;
-    });
-  }
 
   // this will make state when app runs
   @override
   void initState() {
-    getResponse();
+    _dataPfgivo = [];
+    _getPfgivo();
     super.initState();
+  }
+
+  _getPfgivo() async {
+    // String token = await getToken();
+    String token =
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmlzcCI6IjEyMzQ1Iiwicm9sZV9pZCI6MSwiaWF0IjoxNjcxNTQ2NzQ2LCJleHAiOjE2NzE1NzU1NDZ9.QUi71qQp59wxY8zgbFt5SlgKuZBAZb_W7BZTUufCYDg";
+    _dataPfgivo = await ServicePfgivo.getData(token);
+    if (mounted) {
+      setState(() {
+        loading = false;
+      });
+    }
   }
 
   @override
@@ -50,9 +49,10 @@ class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
     initializeDateFormatting('id', null);
     // this is a map of data bacause piechart need a map
     Map<String, double> dataMap = {
-      "in": dataList.isNotEmpty ? dataList[0].datumIn.toDouble() : 0,
-      "out": dataList.isNotEmpty ? dataList[0].out.toDouble() : 0,
-      "stock": dataList.isNotEmpty ? dataList[0].stock.toDouble() : 0,
+      "in": _dataPfgivo.isNotEmpty ? _dataPfgivo[0].stockin.toDouble() : 0,
+      "out": _dataPfgivo.isNotEmpty ? _dataPfgivo[0].stockout.toDouble() : 0,
+      "stock":
+          _dataPfgivo.isNotEmpty ? _dataPfgivo[0].totalstock.toDouble() : 0,
     };
     return Padding(
       padding: const EdgeInsets.all(24),
@@ -60,7 +60,6 @@ class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 15),
             Card(
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
@@ -77,12 +76,13 @@ class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
                   : Column(
                       children: [
                         Padding(
-                          padding: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 8),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Pie Chart",
+                                "Pie Production FG In Vs Out",
                                 style: textOpenSans.copyWith(
                                   fontSize: 14,
                                   fontWeight: bold,
@@ -106,7 +106,6 @@ class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
                                 child: Container(
                                   margin:
                                       const EdgeInsets.symmetric(horizontal: 2),
-                                  width: 140,
                                   height: 36,
                                   decoration: BoxDecoration(
                                     border: Border.all(color: primaryColor),
@@ -162,7 +161,7 @@ class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
                             ),
                             Expanded(
                               child: AspectRatio(
-                                aspectRatio: 1,
+                                aspectRatio: 1.6,
                                 child: PieChart(
                                   dataMap:
                                       dataMap, // this need to be map for piechart
@@ -194,6 +193,63 @@ class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
                       ],
                     ),
             ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              child: Center(
+                child: Text(
+                  "Last 10 Histori",
+                  style: textOpenSans.copyWith(
+                    fontSize: 14,
+                    fontWeight: bold,
+                  ),
+                ),
+              ),
+            ),
+            const DashLineView(fillRate: 1),
+            ListView.builder(
+                shrinkWrap: true,
+                itemCount: _dataPfgivo.length,
+                itemBuilder: ((context, index) {
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    _dataPfgivo[index].order.toString(),
+                                    style: textOpenSans.copyWith(
+                                      fontSize: 16,
+                                      fontWeight: bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    " Order",
+                                    style: textOpenSans,
+                                  )
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                "Barang ${_dataPfgivo[index].idWorkorder}",
+                                style: textOpenSans,
+                              ),
+                            ],
+                          ),
+                          Text(
+                            DateFormat("yMd", "id_ID")
+                                .format(_dataPfgivo[index].createdAt),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                })),
           ],
         ),
       ),
