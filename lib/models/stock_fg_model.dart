@@ -38,9 +38,6 @@ class StockFGModel {
 
 class TabelStckFGModel {
   TabelStckFGModel({
-    required this.id,
-    required this.partId,
-    required this.supplier,
     required this.partNumber,
     required this.partName,
     required this.min,
@@ -49,13 +46,8 @@ class TabelStckFGModel {
     required this.outbond,
     required this.sisa,
     required this.status,
-    required this.createdAt,
-    required this.updatedAt,
   });
 
-  int id;
-  int partId;
-  String supplier;
   String partNumber;
   String partName;
   int min;
@@ -64,14 +56,9 @@ class TabelStckFGModel {
   int outbond;
   int sisa;
   String status;
-  String createdAt;
-  String updatedAt;
 
   factory TabelStckFGModel.fromJson(Map<String, dynamic> json) =>
       TabelStckFGModel(
-        id: json["id"],
-        partId: json["part_id"],
-        supplier: json["supplier"],
         partNumber: json["part-number"],
         partName: json["part-name"],
         min: json["min"],
@@ -80,14 +67,9 @@ class TabelStckFGModel {
         outbond: json["outbond"],
         sisa: json["sisa"],
         status: json["status"],
-        createdAt: json["created_at"],
-        updatedAt: json["updated_at"],
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
-        "part_id": partId,
-        "supplier": supplier,
         "part-number": partNumber,
         "part-name": partName,
         "min": min,
@@ -96,7 +78,5 @@ class TabelStckFGModel {
         "outbond": outbond,
         "sisa": sisa,
         "status": status,
-        "created_at": createdAt,
-        "updated_at": updatedAt,
       };
 }
