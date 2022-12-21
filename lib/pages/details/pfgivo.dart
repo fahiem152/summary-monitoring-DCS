@@ -33,9 +33,7 @@ class _ProdFGInVSOutState extends State<ProdFGInVSOut> {
   }
 
   _getPfgivo() async {
-    // String token = await getToken();
-    String token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmlzcCI6IjEyMzQ1Iiwicm9sZV9pZCI6MSwiaWF0IjoxNjcxNTQ2NzQ2LCJleHAiOjE2NzE1NzU1NDZ9.QUi71qQp59wxY8zgbFt5SlgKuZBAZb_W7BZTUufCYDg";
+    String token = await getToken();
     _dataPfgivo = await ServicePfgivo.getData(token);
     if (mounted) {
       setState(() {
