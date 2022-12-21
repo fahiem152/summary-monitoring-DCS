@@ -31,7 +31,7 @@ class _MonitoringSMState extends State<MonitoringSM> {
     String token = await getToken();
     var response = await http.get(
       Uri.parse(
-        baseURL + "/api/material/stocks",
+        baseURL + "/api/mStocks/Stocks",
       ),
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
@@ -66,8 +66,15 @@ class _MonitoringSMState extends State<MonitoringSM> {
     }
   }
 
-  fungsigetTabelMontoringMaterial() async {
-    ApiResponse response = await getTabelMontoringMaterial();
+  final List<String> itemsSupplier = [
+    'Suzuki',
+    'HPP',
+  ];
+
+  String? pilihSupplier;
+
+  fungsigetTabelMontoringMaterial({required String supplier}) async {
+    ApiResponse response = await getTabelMontoringMaterial(supplier: supplier);
     if (response.error == null) {
       setState(() {
         tabelStockList = response.data as List<dynamic>;
@@ -80,6 +87,7 @@ class _MonitoringSMState extends State<MonitoringSM> {
                 (route) => false)
           });
     } else {
+      print('halo');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('${response.error}'),
       ));
@@ -126,11 +134,13 @@ class _MonitoringSMState extends State<MonitoringSM> {
         ItemListTabel(pWidth: 230, value: msmModel.batchMaterialName),
         ItemListTabel(pWidth: 80, value: msmModel.actual.toString()),
         Container(
-          color: Colors.red,
-          child: const Center(
+          color: msmModel.status == 'normal'
+              ? Color(0xff00D85B)
+              : Color(0xffFB6340),
+          child: Center(
             child: Text(
-              'Over',
-              style: TextStyle(color: Colors.white),
+              msmModel.status,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
           width: 70,
@@ -147,7 +157,8 @@ class _MonitoringSMState extends State<MonitoringSM> {
   void initState() {
     super.initState();
     getData();
-    fungsigetTabelMontoringMaterial();
+    pilihSupplier = 'Suzuki';
+    fungsigetTabelMontoringMaterial(supplier: pilihSupplier.toString());
     // getSuplier();
   }
 
@@ -287,20 +298,15 @@ class _MonitoringSMState extends State<MonitoringSM> {
                                   Row(
                                     children: [
                                       Container(
-                                        color: stockMaterial[index]
-                                                    ['material_id'] ==
-                                                0
+                                        color: stockMaterial[index]['id'] == 0
                                             ? const Color(0xff0263FF)
-                                            : stockMaterial[index]
-                                                        ['material_id'] ==
-                                                    1
+                                            : stockMaterial[index]['id'] == 1
                                                 ? const Color(0xff8E30FF)
-                                                : stockMaterial[index]
-                                                            ['material_id'] ==
+                                                : stockMaterial[index]['id'] ==
                                                         2
                                                     ? const Color(0xffFF7723)
-                                                    : stockMaterial[index][
-                                                                'material_id'] ==
+                                                    : stockMaterial[index]
+                                                                ['id'] ==
                                                             3
                                                         ? const Color(
                                                             0xffe17055)
@@ -373,7 +379,7 @@ class _MonitoringSMState extends State<MonitoringSM> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  'Stock Opname Finish Good',
+                                  'Suplier Monitoring Material ',
                                   style: textOpenSans.copyWith(
                                     color: blackColor,
                                     fontSize: 14,
@@ -393,28 +399,42 @@ class _MonitoringSMState extends State<MonitoringSM> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: DropdownButtonHideUnderline(
-                                      child: DropdownButton(
+                                      child: DropdownButton<String>(
                                         icon: const ImageIcon(
                                           AssetImage(
                                               'assets/icons/arrow-down.png'),
                                         ),
-                                        dropdownColor: Color(0xffF0F1F2),
+                                        dropdownColor: const Color(0xffF0F1F2),
                                         borderRadius: BorderRadius.circular(15),
-                                        hint: const Text('Supplier'),
-                                        items: suplierlist.map((item) {
-                                          return DropdownMenuItem(
-                                            value: item['name_sup'].toString(),
-                                            child: Text(
-                                                item['name_sup'].toString()),
-                                          );
-                                        }).toList(),
-                                        onChanged: (newVal) {
+                                        isExpanded: true,
+                                        items: itemsSupplier
+                                            .map((item) =>
+                                                DropdownMenuItem<String>(
+                                                  value: item,
+                                                  child: Text(
+                                                    item,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color(0xff4B556B),
+                                                      letterSpacing: 1,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ))
+                                            .toList(),
+                                        menuMaxHeight: 300,
+                                        value: pilihSupplier,
+                                        onChanged: (value) {
                                           setState(() {
-                                            valueSuplier = newVal;
-                                            print(valueSuplier);
+                                            pilihSupplier = value as String;
+                                            fungsigetTabelMontoringMaterial(
+                                                supplier:
+                                                    pilihSupplier.toString());
                                           });
                                         },
-                                        value: valueSuplier,
                                       ),
                                     ),
                                   ),
@@ -525,21 +545,54 @@ class _MonitoringSMState extends State<MonitoringSM> {
                               height: 20,
                             ),
                             Expanded(
-                              child: HorizontalDataTable(
-                                leftHandSideColumnWidth: 50,
-                                rightHandSideColumnWidth: 380,
-                                isFixedHeader: true,
-                                headerWidgets: _getTitle(),
-                                leftSideItemBuilder: _firstColumnRow,
-                                rightSideItemBuilder: _rightHandSideColumnRow,
-                                itemCount: tabelStockList.length,
-                                rowSeparatorWidget: const Divider(
-                                  color: Colors.black54,
-                                  height: 1.0,
-                                  thickness: 0.0,
-                                ),
-                                // leftHandSideColBackgroundColor: Color(0xFFFFFFFF),
-                                // rightHandSideColBackgroundColor: Color(0xFFFFFFFF),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Column(
+                                    children: [
+                                      Container(
+                                        height: 30,
+                                        width: 70,
+                                        color: const Color.fromARGB(
+                                            255, 78, 78, 78),
+                                        child: const Center(
+                                            child: Text(
+                                          'Supplier',
+                                          style: TextStyle(color: Colors.white),
+                                        )),
+                                      ),
+                                      Expanded(
+                                        child: SizedBox(
+                                            width: 70,
+                                            child: Center(
+                                                child: Text(
+                                              pilihSupplier.toString(),
+                                              style:
+                                                  TextStyle(color: black5Color),
+                                            ))),
+                                      ),
+                                    ],
+                                  ),
+                                  Expanded(
+                                    child: HorizontalDataTable(
+                                      leftHandSideColumnWidth: 50,
+                                      rightHandSideColumnWidth: 380,
+                                      isFixedHeader: true,
+                                      headerWidgets: _getTitle(),
+                                      leftSideItemBuilder: _firstColumnRow,
+                                      rightSideItemBuilder:
+                                          _rightHandSideColumnRow,
+                                      itemCount: tabelStockList.length,
+                                      rowSeparatorWidget: const Divider(
+                                        color: Colors.black54,
+                                        height: 1.0,
+                                        thickness: 0.0,
+                                      ),
+                                      // leftHandSideColBackgroundColor: Color(0xFFFFFFFF),
+                                      // rightHandSideColBackgroundColor: Color(0xFFFFFFFF),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ],

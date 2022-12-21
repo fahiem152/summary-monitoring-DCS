@@ -30,18 +30,20 @@ class _StockFGState extends State<StockFG> {
   bool _loading = true;
   List<dynamic> tabelStockList = [];
 
-  void getData() async {
+  void getData({required String tanggal}) async {
     String token = await getToken();
     var response = await http.get(
       Uri.parse(
-        baseURL + "/api/fg/stock/chart",
+        tanggal == ''
+            ? baseURL + "/api/fg/stock/chart"
+            : baseURL + "/api/fg/stock/chart?date=$tanggal",
       ),
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'Authorization': 'Bearer $token'
       },
     );
-    List data = json.decode(response.body)['list']['data'];
+    List data = json.decode(response.body)['list'];
 
     setState(() {
       //memasukan data json ke dalam model
@@ -51,28 +53,8 @@ class _StockFGState extends State<StockFG> {
     });
   }
 
-  List suplierlist = [];
-  var valueSuplier;
-  Future getSuplier() async {
-    String token = await getToken();
-    final response = await http.get(
-      Uri.parse(baseURL + '/api/stechoq/tabel-stock-ofg'),
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Authorization': 'Bearer $token'
-      },
-    );
-    print(response.body);
-    if (response.statusCode == 200) {
-      var jsonData = json.decode(response.body)['suplier'];
-      setState(() {
-        suplierlist = jsonData;
-      });
-    }
-  }
-
-  fungsigetTabelStockOpnameFg() async {
-    ApiResponse response = await getTabelStockOpnameFg();
+  fungsigetTabelStockOpnameFg({required String supplier}) async {
+    ApiResponse response = await getTabelStockOpnameFg(supplier: supplier);
     if (response.error == null) {
       setState(() {
         tabelStockList = response.data as List<dynamic>;
@@ -90,6 +72,13 @@ class _StockFGState extends State<StockFG> {
       ));
     }
   }
+
+  final List<String> itemsSupplier = [
+    'HPP',
+    'TKI',
+  ];
+
+  String? pilihSupplier;
 
   List<charts.Series<StockFGModel, String>> chartStockOpnameFg() {
     return [
@@ -111,7 +100,7 @@ class _StockFGState extends State<StockFG> {
       _getTitleItemWidget('Inbound', 70),
       _getTitleItemWidget('Outbound', 80),
       _getTitleItemWidget('Sisa', 50),
-      _getTitleItemWidget('Status', 70),
+      _getTitleItemWidget('Status', 85),
     ];
   }
 
@@ -150,7 +139,7 @@ class _StockFGState extends State<StockFG> {
         ItemListTabel(pWidth: 80, value: tabelStckFGModel.outbond.toString()),
         ItemListTabel(pWidth: 50, value: tabelStckFGModel.sisa.toString()),
         Container(
-          color: tabelStckFGModel.status == 'normal'
+          color: tabelStckFGModel.status == 'NORMAL'
               ? Colors.green
               : tabelStckFGModel.status == '0VERLOAD'
                   ? Colors.red
@@ -161,7 +150,7 @@ class _StockFGState extends State<StockFG> {
               style: const TextStyle(color: Colors.white),
             ),
           ),
-          width: 70,
+          width: 85,
           height: 52,
           padding: const EdgeInsets.fromLTRB(5, 0, 0, 0),
           alignment: Alignment.centerLeft,
@@ -174,9 +163,11 @@ class _StockFGState extends State<StockFG> {
   @override
   void initState() {
     super.initState();
-    getData();
-    fungsigetTabelStockOpnameFg();
+    getData(tanggal: '');
+    pilihSupplier = 'HPP';
+    fungsigetTabelStockOpnameFg(supplier: pilihSupplier.toString());
     // getSuplier();
+
     tanggal.text = datenow;
   }
 
@@ -226,12 +217,13 @@ class _StockFGState extends State<StockFG> {
 
                                   if (pickedDate2 != null) {
                                     String formattedDate2 =
-                                        DateFormat('dd/MM/yyyy')
+                                        DateFormat('yyyy-MM-dd')
                                             .format(pickedDate2);
                                     print(formattedDate2);
 
                                     setState(() {
                                       tanggal.text = formattedDate2;
+                                      getData(tanggal: tanggal.text);
                                     });
                                   } else {
                                     print("Date is not selected");
@@ -341,28 +333,42 @@ class _StockFGState extends State<StockFG> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(8.0),
                                     child: DropdownButtonHideUnderline(
-                                      child: DropdownButton(
+                                      child: DropdownButton<String>(
                                         icon: const ImageIcon(
                                           AssetImage(
                                               'assets/icons/arrow-down.png'),
                                         ),
                                         dropdownColor: const Color(0xffF0F1F2),
                                         borderRadius: BorderRadius.circular(15),
-                                        hint: const Text('Supplier'),
-                                        items: suplierlist.map((item) {
-                                          return DropdownMenuItem(
-                                            value: item['name_sup'].toString(),
-                                            child: Text(
-                                                item['name_sup'].toString()),
-                                          );
-                                        }).toList(),
-                                        onChanged: (newVal) {
+                                        isExpanded: true,
+                                        items: itemsSupplier
+                                            .map((item) =>
+                                                DropdownMenuItem<String>(
+                                                  value: item,
+                                                  child: Text(
+                                                    item,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Color(0xff4B556B),
+                                                      letterSpacing: 1,
+                                                    ),
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                ))
+                                            .toList(),
+                                        menuMaxHeight: 300,
+                                        value: pilihSupplier,
+                                        onChanged: (value) {
                                           setState(() {
-                                            valueSuplier = newVal;
-                                            print(valueSuplier);
+                                            pilihSupplier = value as String;
+                                            fungsigetTabelStockOpnameFg(
+                                                supplier:
+                                                    pilihSupplier.toString());
                                           });
                                         },
-                                        value: valueSuplier,
                                       ),
                                     ),
                                   ),
@@ -375,7 +381,7 @@ class _StockFGState extends State<StockFG> {
                             Expanded(
                               child: HorizontalDataTable(
                                 leftHandSideColumnWidth: 100,
-                                rightHandSideColumnWidth: 600,
+                                rightHandSideColumnWidth: 620,
                                 isFixedHeader: true,
                                 headerWidgets: _getTitle(),
                                 leftSideItemBuilder: _firstColumnRow,
