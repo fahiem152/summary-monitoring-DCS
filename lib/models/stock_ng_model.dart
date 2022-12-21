@@ -1,58 +1,120 @@
+import 'package:intl/intl.dart';
+import 'dart:convert';
+
+Sngp sngpFromJson(String str) => Sngp.fromJson(json.decode(str));
+String sngpToJson(Sngp data) => jsonEncode(data.toJson());
 List<StockNGModel> stockModelNGFromJson(List data) => List<StockNGModel>.from(
       data.map(
         (x) => StockNGModel.fromJson(x),
       ),
     );
-List<ScrabNGModel> scrabModelNGFromJson(List data) => List<ScrabNGModel>.from(
+List<QtyNGModel> scrabModelNGFromJson(List data) => List<QtyNGModel>.from(
       data.map(
-        (x) => ScrabNGModel.fromJson(x),
+        (x) => QtyNGModel.fromJson(x),
       ),
     );
 
-class StockNGModel {
-  String material;
-  String material_number;
-  List<ScrabNGModel> scrab_ng;
-  StockNGModel({
-    required this.material,
-    required this.material_number,
-    required this.scrab_ng,
+class Sngp {
+  Sngp({
+    required this.status,
+    required this.list,
   });
-  factory StockNGModel.fromJson(Map<String, dynamic> json) => StockNGModel(
-        material: json["material"],
-        material_number: json["material_number"],
-        scrab_ng: json['scrab_ng']
-            .map<ScrabNGModel>((scrab_ng) => ScrabNGModel.fromJson(scrab_ng))
-            .toList(),
+
+  bool status;
+  ListClassSummaryNG list;
+
+  factory Sngp.fromJson(Map<String, dynamic> json) => Sngp(
+        status: json["status"],
+        list: ListClassSummaryNG.fromJson(json["list"]),
       );
 
   Map<String, dynamic> toJson() => {
-        "material": material,
-        "material_number": material_number,
-        "scrab_ng": scrab_ng.map((scarb_ng) => scarb_ng.toJson()).toList(),
+        "status": status,
+        "list": list.toJson(),
       };
-
-  int getQuantityNG() {
-    return scrab_ng.fold(
-        0, (previousValue, element) => previousValue + element.value);
-  }
 }
 
-class ScrabNGModel {
-  String name;
-  int value;
-  ScrabNGModel({
-    required this.name,
-    required this.value,
+class ListClassSummaryNG {
+  ListClassSummaryNG({
+    required this.data,
   });
 
-  factory ScrabNGModel.fromJson(Map<String, dynamic> json) => ScrabNGModel(
+  List<StockNGModel> data;
+
+  factory ListClassSummaryNG.fromJson(Map<String, dynamic> json) =>
+      ListClassSummaryNG(
+        data: List<StockNGModel>.from(
+            json["data"].map((x) => StockNGModel.fromJson(x))),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "data": List<dynamic>.from(data.map((x) => x.toJson())),
+      };
+}
+
+class StockNGModel {
+  int id;
+  int part_id;
+  String part_number;
+  String part_name;
+  List<QtyNGModel> qty_ng;
+  int total;
+  DateTime created_at;
+  DateTime updated_at;
+
+  StockNGModel({
+    required this.id,
+    required this.part_id,
+    required this.part_number,
+    required this.part_name,
+    required this.qty_ng,
+    required this.total,
+    required this.created_at,
+    required this.updated_at,
+  });
+
+  factory StockNGModel.fromJson(Map<String, dynamic> json) => StockNGModel(
+        id: json["id"],
+        part_id: json["part_id"],
+        part_number: json["part_number"],
+        part_name: json["part_name"],
+        qty_ng: json["qty_ng"]
+            .map<QtyNGModel>((qty_ng) => QtyNGModel.fromJson(qty_ng))
+            .toList(),
+        total: json["total"],
+        created_at:
+            DateFormat('yyyy-MM-dd').parse(json["created_at"] as String),
+        updated_at:
+            DateFormat('yyyy-MM-dd').parse(json["updated_at"] as String),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "part_id": part_id,
+        "part_number": part_number,
+        "part_name": part_name,
+        "qty_ng": qty_ng.map((qty_ng) => qty_ng.toJson()).toList(),
+        "total": total,
+        "created_at": created_at.toString(),
+        "updated_at": updated_at.toString(),
+      };
+}
+
+class QtyNGModel {
+  String name;
+  int total;
+  QtyNGModel({
+    required this.name,
+    required this.total,
+  });
+
+  factory QtyNGModel.fromJson(Map<String, dynamic> json) => QtyNGModel(
         name: json["name"],
-        value: json["value"],
+        total: json["total"],
       );
 
   Map<String, dynamic> toJson() => {
         "name": name,
-        "value": value,
+        "total": total,
       };
 }
