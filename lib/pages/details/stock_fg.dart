@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_pagination/flutter_pagination.dart';
+import 'package:flutter_pagination/widgets/button_styles.dart';
 import 'package:http/http.dart' as http;
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:intl/intl.dart';
@@ -53,8 +55,11 @@ class _StockFGState extends State<StockFG> {
     });
   }
 
-  fungsigetTabelStockOpnameFg({required String supplier}) async {
-    ApiResponse response = await getTabelStockOpnameFg(supplier: supplier);
+  int currentPage = 1;
+  fungsigetTabelStockOpnameFg(
+      {required String supplier, required String page}) async {
+    ApiResponse response =
+        await getTabelStockOpnameFg(supplier: supplier, page: page);
     if (response.error == null) {
       setState(() {
         tabelStockList = response.data as List<dynamic>;
@@ -71,6 +76,29 @@ class _StockFGState extends State<StockFG> {
         content: Text('${response.error}'),
       ));
     }
+  }
+
+  int totalPage = 0;
+  String kondisi = '';
+  void getPaginasi({required String supplier}) async {
+    String token = await getToken();
+    var response = await http.get(
+      Uri.parse(
+        baseURL + "/api/fg/stock/detail?supplier=$supplier",
+      ),
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Authorization': 'Bearer $token'
+      },
+    );
+    int total = json.decode(response.body)['total_page'];
+
+    setState(() {
+      //memasukan data json ke dalam model
+      totalPage = total;
+      kondisi = 'ada';
+      loading = false;
+    });
   }
 
   final List<String> itemsSupplier = [
@@ -141,7 +169,7 @@ class _StockFGState extends State<StockFG> {
         Container(
           color: tabelStckFGModel.status == 'NORMAL'
               ? Colors.green
-              : tabelStckFGModel.status == '0VERLOAD'
+              : tabelStckFGModel.status == 'OVERLOAD'
                   ? Colors.red
                   : Colors.orange,
           child: Center(
@@ -165,8 +193,10 @@ class _StockFGState extends State<StockFG> {
     super.initState();
     getData(tanggal: '');
     pilihSupplier = 'HPP';
-    fungsigetTabelStockOpnameFg(supplier: pilihSupplier.toString());
+    fungsigetTabelStockOpnameFg(
+        supplier: pilihSupplier.toString(), page: currentPage.toString());
     // getSuplier();
+    getPaginasi(supplier: pilihSupplier.toString());
 
     tanggal.text = datenow;
   }
@@ -366,7 +396,8 @@ class _StockFGState extends State<StockFG> {
                                             pilihSupplier = value as String;
                                             fungsigetTabelStockOpnameFg(
                                                 supplier:
-                                                    pilihSupplier.toString());
+                                                    pilihSupplier.toString(),
+                                                page: currentPage.toString());
                                           });
                                         },
                                       ),
@@ -396,6 +427,33 @@ class _StockFGState extends State<StockFG> {
                                 // rightHandSideColBackgroundColor: Color(0xFFFFFFFF),
                               ),
                             ),
+                            kondisi == 'ada'
+                                ? Pagination(
+                                    paginateButtonStyles:
+                                        PaginateButtonStyles(),
+                                    prevButtonStyles: PaginateSkipButton(
+                                        borderRadius: const BorderRadius.only(
+                                            topLeft: Radius.circular(20),
+                                            bottomLeft: Radius.circular(20))),
+                                    nextButtonStyles: PaginateSkipButton(
+                                        borderRadius: const BorderRadius.only(
+                                            topRight: Radius.circular(20),
+                                            bottomRight: Radius.circular(20))),
+                                    onPageChange: (number) {
+                                      setState(() {
+                                        currentPage = number;
+                                        print(currentPage);
+                                        fungsigetTabelStockOpnameFg(
+                                            supplier: pilihSupplier.toString(),
+                                            page: currentPage.toString());
+                                      });
+                                    },
+                                    useGroup: true,
+                                    totalPage: kondisi == 'ada' ? 2 : totalPage,
+                                    show: 1,
+                                    currentPage: currentPage,
+                                  )
+                                : const SizedBox(),
                           ],
                         ),
                 ),

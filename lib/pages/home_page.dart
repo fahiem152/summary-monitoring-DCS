@@ -24,9 +24,9 @@ class _HomePageState extends State<HomePage> {
   getPref() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     setState(() {
-      role = preferences.getString("role")!;
-      firstName = preferences.getString("firstName")!;
-      lastName = preferences.getString("lastName")!;
+      role = preferences.getString("role") ?? '';
+      firstName = preferences.getString("firstName") ?? '';
+      lastName = preferences.getString("lastName") ?? '';
     });
   }
 
