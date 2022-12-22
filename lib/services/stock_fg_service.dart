@@ -7,12 +7,14 @@ import 'package:http/http.dart' as http;
 
 import '../models/stock_fg_model.dart';
 
-Future<ApiResponse> getTabelStockOpnameFg({required String supplier, required String page}) async {
+Future<ApiResponse> getTabelStockOpnameFg(
+    {required String supplier, required String page}) async {
   ApiResponse apiResponse = ApiResponse();
   try {
     String token = await getToken();
     final response = await http.get(
-        Uri.parse(baseURL + "/api/fg/stock/detail?supplier=$supplier&page=$page&per_page=1"),
+        Uri.parse(baseURL +
+            "/api/fg/stock/detail?supplier=$supplier&page=$page&per_page=1"),
         headers: {
           'Accept': 'application/json',
           'X-Requested-With': 'XMLHttpRequest',
@@ -20,7 +22,7 @@ Future<ApiResponse> getTabelStockOpnameFg({required String supplier, required St
         });
     switch (response.statusCode) {
       case 200:
-        print(response.body);
+        // print(response.body);
         apiResponse.data = jsonDecode(response.body)['list'][0]['detail']
             .map((p) => TabelStckFGModel.fromJson(p))
             .toList();
