@@ -28,6 +28,8 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
   late List<DataMivo> _dataMivo;
   late List<DataRak> _dataRak;
   double size = 22;
+  TextEditingController tanggal = TextEditingController();
+  final String datenow = DateFormat('dd/MM/yyyy').format(DateTime.now());
 
   final List<String> itemsRak = [
     'M',
@@ -53,17 +55,29 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
     _dataRak = [];
     _getMonRak();
     _dataMivo = [];
+    tanggal.text = datenow;
     pilihAdress = "A1.01.01";
     pilihMaterial = '1';
     pilihRak = 'M';
     _getDataMivo();
     _getAdress();
+    _getDate();
     super.initState();
   }
 
   _getDataMivo() async {
     String token = await getToken();
     _dataMivo = await ServiceMivo.getDataMivo(token, pilihMaterial.toString());
+    if (mounted) {
+      setState(() {
+        loading = false;
+      });
+    }
+  }
+
+  _getDate() async {
+    String token = await getToken();
+    _dataMivo = await ServiceMivo.getDateDataMivo(token, date: tanggal.text);
     if (mounted) {
       setState(() {
         loading = false;
@@ -184,18 +198,26 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                               const SizedBox(width: 8),
                               InkWell(
                                 borderRadius: BorderRadius.circular(8),
-                                onTap: () {
-                                  showDatePicker(
-                                    context: context,
-                                    initialDate: DateTime(2021),
-                                    firstDate: DateTime(2021),
-                                    lastDate: DateTime.now(),
-                                  ).then((date) {
+                                onTap: () async {
+                                  DateTime? pickedDate2 = await showDatePicker(
+                                      context: context,
+                                      initialDate: DateTime.now(),
+                                      firstDate: DateTime(2000),
+                                      lastDate: DateTime(2101));
+
+                                  if (pickedDate2 != null) {
+                                    String formattedDate2 =
+                                        DateFormat("yyyy-MM-dd", "id")
+                                            .format(pickedDate2);
+                                    print(formattedDate2);
+
                                     setState(() {
-                                      _dateTime = date;
-                                      print(_dateTime);
+                                      tanggal.text = formattedDate2;
+                                      _getDate();
                                     });
-                                  });
+                                  } else {
+                                    print("Date is not selected");
+                                  }
                                 },
                                 child: Container(
                                   margin:
@@ -224,11 +246,10 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                         ),
                                         const SizedBox(width: 8),
                                         Text(
-                                          _dateTime == null
-                                              ? DateFormat("yMd", "id")
+                                          tanggal.text.isEmpty
+                                              ? DateFormat("yyyy-MM-dd", "id")
                                                   .format(DateTime.now())
-                                              : DateFormat("yMd", "id")
-                                                  .format(_dateTime!),
+                                              : tanggal.text,
                                           style: textOpenSans.copyWith(
                                             fontWeight: regular,
                                           ),
@@ -252,94 +273,111 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                             fillRate: 1,
                           ),
                         ),
-                        Row(
-                          children: [
-                            const SizedBox(
-                              height: 18,
-                            ),
-                            Expanded(
-                              child: AspectRatio(
-                                aspectRatio: 1,
-                                child: PieChart(
-                                  PieChartData(
-                                    pieTouchData: PieTouchData(
-                                      touchCallback: (FlTouchEvent event,
-                                          pieTouchResponse) {
-                                        setState(() {
-                                          if (!event
-                                                  .isInterestedForInteractions ||
-                                              pieTouchResponse == null ||
-                                              pieTouchResponse.touchedSection ==
-                                                  null) {
-                                            touchedIndex = -1;
-                                            return;
-                                          }
-                                          touchedIndex = pieTouchResponse
-                                              .touchedSection!
-                                              .touchedSectionIndex;
-                                        });
-                                      },
+                        _dataMivo.isEmpty
+                            ? SizedBox(
+                                height: 50,
+                                child: Center(
+                                  child: Text(
+                                    "Tidak ada grafik di hari ini",
+                                    style: textOpenSans.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: semiBold,
                                     ),
-                                    borderData: FlBorderData(
-                                      show: false,
-                                    ),
-                                    sectionsSpace: 0,
-                                    centerSpaceRadius: 0,
-                                    sections: showingSections(touchedIndex),
                                   ),
-                                  swapAnimationDuration: const Duration(
-                                      milliseconds: 150), // Optional
-                                  swapAnimationCurve: Curves.linear,
                                 ),
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: <Widget>[
-                                  Indicator(
-                                    color: const Color(0xff63E758),
-                                    value:
-                                        "${_dataMivo.isNotEmpty ? _dataMivo[0].totalIn : 0} Kg",
-                                    text: 'In',
-                                    isSquare: false,
-                                    size: touchedIndex == 0 ? 18 : 16,
-                                    textColor: touchedIndex == 0
-                                        ? Colors.black
-                                        : blackColor,
+                              )
+                            : Row(
+                                children: [
+                                  const SizedBox(
+                                    height: 18,
                                   ),
-                                  Indicator(
-                                    color: const Color(0xff165BAA),
-                                    value:
-                                        '${_dataMivo.isNotEmpty ? _dataMivo[0].totalOut : 0} Kg',
-                                    text: 'Out',
-                                    isSquare: false,
-                                    size: touchedIndex == 1 ? 18 : 16,
-                                    textColor: touchedIndex == 1
-                                        ? Colors.black
-                                        : blackColor,
+                                  Expanded(
+                                    child: AspectRatio(
+                                      aspectRatio: 1,
+                                      child: PieChart(
+                                        PieChartData(
+                                          pieTouchData: PieTouchData(
+                                            touchCallback: (FlTouchEvent event,
+                                                pieTouchResponse) {
+                                              setState(() {
+                                                if (!event
+                                                        .isInterestedForInteractions ||
+                                                    pieTouchResponse == null ||
+                                                    pieTouchResponse
+                                                            .touchedSection ==
+                                                        null) {
+                                                  touchedIndex = -1;
+                                                  return;
+                                                }
+                                                touchedIndex = pieTouchResponse
+                                                    .touchedSection!
+                                                    .touchedSectionIndex;
+                                              });
+                                            },
+                                          ),
+                                          borderData: FlBorderData(
+                                            show: false,
+                                          ),
+                                          sectionsSpace: 0,
+                                          centerSpaceRadius: 0,
+                                          sections:
+                                              showingSections(touchedIndex),
+                                        ),
+                                        swapAnimationDuration: const Duration(
+                                            milliseconds: 150), // Optional
+                                        swapAnimationCurve: Curves.linear,
+                                      ),
+                                    ),
                                   ),
-                                  Indicator(
-                                    color: const Color(0xffF765A3),
-                                    value:
-                                        '${_dataMivo.isNotEmpty ? _dataMivo[0].totalStock : 0} Kg',
-                                    text: 'Stock',
-                                    isSquare: false,
-                                    size: touchedIndex == 2 ? 18 : 16,
-                                    textColor: touchedIndex == 2
-                                        ? Colors.black
-                                        : blackColor,
+                                  Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      children: <Widget>[
+                                        Indicator(
+                                          color: const Color(0xff63E758),
+                                          value:
+                                              "${_dataMivo.isNotEmpty ? _dataMivo[0].totalIn : 0} Kg",
+                                          text: 'In',
+                                          isSquare: false,
+                                          size: touchedIndex == 0 ? 18 : 16,
+                                          textColor: touchedIndex == 0
+                                              ? Colors.black
+                                              : blackColor,
+                                        ),
+                                        Indicator(
+                                          color: const Color(0xff165BAA),
+                                          value:
+                                              '${_dataMivo.isNotEmpty ? _dataMivo[0].totalOut : 0} Kg',
+                                          text: 'Out',
+                                          isSquare: false,
+                                          size: touchedIndex == 1 ? 18 : 16,
+                                          textColor: touchedIndex == 1
+                                              ? Colors.black
+                                              : blackColor,
+                                        ),
+                                        Indicator(
+                                          color: const Color(0xffF765A3),
+                                          value:
+                                              '${_dataMivo.isNotEmpty ? _dataMivo[0].totalStock : 0} Kg',
+                                          text: 'Stock',
+                                          isSquare: false,
+                                          size: touchedIndex == 2 ? 18 : 16,
+                                          textColor: touchedIndex == 2
+                                              ? Colors.black
+                                              : blackColor,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  const SizedBox(
+                                    width: 28,
                                   ),
                                 ],
                               ),
-                            ),
-                            const SizedBox(
-                              width: 28,
-                            ),
-                          ],
-                        ),
                       ],
                     ),
             ),
