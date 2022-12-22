@@ -156,45 +156,46 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "Pie Chart",
+                                "Pie Chart ${_dataMivo.isNotEmpty ? _dataMivo[0].material : ""}",
                                 style: textOpenSans.copyWith(
                                   fontSize: 14,
                                   fontWeight: bold,
                                 ),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 6),
-                                child: DropdownButton(
-                                  underline: const SizedBox(),
-                                  hint: const Text('Select Material'),
-                                  icon: const Visibility(
-                                      visible: false,
-                                      child: Icon(Icons.arrow_downward)),
-                                  items: itemsMaterial
-                                      .map((item) => DropdownMenuItem<String>(
-                                            value: item,
-                                            child: item == "1"
-                                                ? const Text("Material")
-                                                : const Text("Batch Material"),
-                                          ))
-                                      .toList(),
-                                  style: textOpenSans.copyWith(
-                                    color: blackColor,
-                                    fontSize: 14,
-                                    fontWeight: bold,
-                                  ),
-                                  elevation: 0,
-                                  dropdownColor: whiteColor,
-                                  onChanged: (newVal) {
-                                    setState(() {
-                                      pilihMaterial = newVal as String;
-                                      print(newVal);
-                                      _getDataMivo();
-                                    });
-                                  },
-                                  value: pilihMaterial,
-                                ),
-                              ),
+                              // Padding(
+                              //   padding: const EdgeInsets.only(left: 6),
+                              //   child: DropdownButton(
+                              //     underline: const SizedBox(),
+                              //     hint: const Text('Select Material'),
+                              //     icon: const Visibility(
+                              //         visible: false,
+                              //         child: Icon(Icons.arrow_downward)),
+                              //     items: itemsMaterial
+                              //         .map((item) => DropdownMenuItem<String>(
+                              //               value: item,
+                              //               child: item == "1"
+                              //                   ? const Text("Material")
+                              //                   : const Text("Batch Material"),
+                              //             ))
+                              //         .toList(),
+                              //     style: textOpenSans.copyWith(
+                              //       color: blackColor,
+                              //       fontSize: 14,
+                              //       fontWeight: bold,
+                              //     ),
+                              //     elevation: 0,
+                              //     dropdownColor: whiteColor,
+                              //     onChanged: (newVal) {
+                              //       setState(() {
+                              //         pilihMaterial = newVal as String;
+                              //         print(newVal);
+                              //         _getDataMivo();
+                              //         _getDate();
+                              //       });
+                              //     },
+                              //     value: pilihMaterial,
+                              //   ),
+                              // ),
                               const SizedBox(width: 8),
                               InkWell(
                                 borderRadius: BorderRadius.circular(8),
@@ -456,7 +457,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                               _getMonRak();
                                             });
                                           },
-                                          value: pilihRak,
+                                          value: _dataRak[0].type,
                                         ),
                                       ),
                                     ),
@@ -503,7 +504,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                               _getAdress();
                                             });
                                           },
-                                          value: pilihAdress,
+                                          value: _dataRak[0].address,
                                         ),
                                       ),
                                     ),
@@ -567,7 +568,7 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                                 ),
                                               ),
                                               Text(
-                                                "${_dataMivo.isNotEmpty ? _dataRak[index].used.toString() : 0} Kg",
+                                                "${_dataRak.isNotEmpty ? _dataRak[0].used.toString() : 0} Kg",
                                                 style: textOpenSans.copyWith(
                                                   fontSize: 14,
                                                   fontWeight: regular,
@@ -598,8 +599,8 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                                 ),
                                               ),
                                               Text(
-                                                _dataMivo.isNotEmpty
-                                                    ? _dataRak[index]
+                                                _dataRak.isNotEmpty
+                                                    ? _dataRak[0]
                                                         .available
                                                         .toString()
                                                     : 0.toString(),
@@ -633,8 +634,8 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                                 ),
                                               ),
                                               Text(
-                                                _dataMivo.isNotEmpty
-                                                    ? _dataRak[index]
+                                                _dataRak.isNotEmpty
+                                                    ? _dataRak[0]
                                                         .totalSupplier
                                                         .toString()
                                                     : 0.toString(),
