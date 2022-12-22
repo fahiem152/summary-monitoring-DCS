@@ -489,6 +489,8 @@ class _MaterialInVSOutState extends State<MaterialInVSOut> {
                                 child: charts.BarChart(
                                   _createSampleData(),
                                   animate: true,
+                                  barGroupingType:
+                                      charts.BarGroupingType.stacked,
                                 ),
                               ),
                               Padding(

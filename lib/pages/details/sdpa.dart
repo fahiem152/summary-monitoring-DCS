@@ -4,6 +4,8 @@ import 'package:d_chart/d_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:monitoring_mobile/constan.dart';
+import 'package:monitoring_mobile/helper/user_info.dart';
 import 'package:monitoring_mobile/models/plan_actual_modal.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 
@@ -19,64 +21,59 @@ class SumDailyProdAchiev extends StatefulWidget {
 class _SumDailyProdAchievState extends State<SumDailyProdAchiev> {
   TextEditingController tanggal = TextEditingController();
   final String datenow = DateFormat('dd/MM/yyyy').format(DateTime.now());
+
   bool loading = true;
   List percentageList = [];
-  List<PLanActualModel> planned = [];
-  List<PLanActualModel> achieved = [];
-  List<PLanActualModel> gap = [];
-  String total = '';
-
-  void getData() async {
-    var response = await http.get(
-      Uri.parse(
-        "https://638c9d1beafd555746aa50c9.mockapi.io/percentage",
-      ),
-    );
-    var data = json.decode(response.body)['data'];
-    setState(() {
-      // total = data
-      percentageList = data;
-      loading = false;
-    });
-  }
+  List<Achieved> planned = [];
+  List<Achieved> achieved = [];
+  List<Achieved> gap = [];
 
   void getPlan() async {
+    String token = await getToken();
     var response = await http.get(
       Uri.parse(
-        "https://6391f112b750c8d178d23df5.mockapi.io/api/plan-actual",
+        baseURL + "/api/summary/dpa",
       ),
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Authorization': 'Bearer $token'
+      },
     );
-    var planneds = json.decode(response.body)['data']['planned'];
-    var achieveds = json.decode(response.body)['data']['achieved'];
-    var gaps = json.decode(response.body)['data']['gap'];
+    var planneds = json.decode(response.body)['list']["data"][0]['planned'];
+    var achieveds = json.decode(response.body)['list']["data"][0]['achieved'];
+    var gaps = json.decode(response.body)['list']["data"][0]['gap'];
+    var percentages =
+        json.decode(response.body)['list']["data"][0]['percentage'];
     setState(() {
-      planned = planActualModelFromJson(planneds);
-      achieved = planActualModelFromJson(achieveds);
-      gap = planActualModelFromJson(gaps);
+      print(response);
+      planned = achievedModelFromJson(planneds);
+      achieved = achievedModelFromJson(achieveds);
+      gap = achievedModelFromJson(gaps);
+      percentageList = percentages;
       loading = false;
     });
   }
 
-  List<charts.Series<PLanActualModel, String>> _createSampleData() {
+  List<charts.Series<Achieved, String>> _createSampleData() {
     return [
-      charts.Series<PLanActualModel, String>(
+      charts.Series<Achieved, String>(
         id: 'planned',
-        domainFn: (PLanActualModel testModel, _) => testModel.name,
-        measureFn: (PLanActualModel testModel, _) => testModel.value,
+        domainFn: (Achieved testModel, _) => testModel.name.toString(),
+        measureFn: (Achieved testModel, _) => testModel.value,
         seriesColor: charts.ColorUtil.fromDartColor(const Color(0xff376ED9)),
         data: planned,
       ),
-      charts.Series<PLanActualModel, String>(
+      charts.Series<Achieved, String>(
         id: 'gap',
-        domainFn: (PLanActualModel testModel, _) => testModel.name.toString(),
-        measureFn: (PLanActualModel testModel, _) => testModel.value,
+        domainFn: (Achieved testModel, _) => testModel.name.toString(),
+        measureFn: (Achieved testModel, _) => testModel.value,
         seriesColor: charts.ColorUtil.fromDartColor(const Color(0xffE94D4D)),
         data: gap,
       ),
-      charts.Series<PLanActualModel, String>(
+      charts.Series<Achieved, String>(
         id: 'achieved',
-        domainFn: (PLanActualModel testModel, _) => testModel.name,
-        measureFn: (PLanActualModel testModel, _) => testModel.value,
+        domainFn: (Achieved testModel, _) => testModel.name,
+        measureFn: (Achieved testModel, _) => testModel.value,
         seriesColor: charts.ColorUtil.fromDartColor(const Color(0xff219653)),
         data: achieved,
       )
@@ -86,7 +83,7 @@ class _SumDailyProdAchievState extends State<SumDailyProdAchiev> {
   void initState() {
     super.initState();
     tanggal.text = datenow;
-    getData();
+    // getData();
     getPlan();
   }
 
@@ -234,11 +231,13 @@ class _SumDailyProdAchievState extends State<SumDailyProdAchiev> {
                             }
                           }),
                           donutWidth: 60,
-                          labelColor: Colors.white,
+                          labelColor: const Color(0xff219653),
                         ),
                         Center(
                           child: Text(
-                            'Total',
+                            percentageList.isNotEmpty
+                                ? '${percentageList[0]["value"].toString()} %'
+                                : 0.toString(),
                             style: textOpenSans.copyWith(
                               color: blackColor,
                               fontSize: 16,
@@ -246,7 +245,7 @@ class _SumDailyProdAchievState extends State<SumDailyProdAchiev> {
                               letterSpacing: 1,
                             ),
                           ),
-                        )
+                        ),
                       ],
                     )),
                   ],
