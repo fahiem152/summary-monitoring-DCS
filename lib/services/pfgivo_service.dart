@@ -46,7 +46,7 @@ class ServicePfgivo {
       // If the server did return a 200 OK response,
       // then parse the JSON.
       var jsonObject = jsonDecode(response.body);
-      List data = (jsonObject as Map<String, dynamic>)["list"];
+      List data = (jsonObject as Map<String, dynamic>)["list"]["data"];
       List<DataPfgivo> lisData = [];
       lisData = pfgivoModelFromJson(data);
       return lisData;
