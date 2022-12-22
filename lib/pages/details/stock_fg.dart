@@ -25,7 +25,7 @@ class StockFG extends StatefulWidget {
 
 class _StockFGState extends State<StockFG> {
   TextEditingController tanggal = TextEditingController();
-  final String datenow = DateFormat('dd/MM/yyyy').format(DateTime.now());
+  final String datenow = DateFormat('yyyy-MM-dd').format(DateTime.now());
 
   List<StockFGModel> stock = [];
   bool loading = true;
@@ -35,11 +35,9 @@ class _StockFGState extends State<StockFG> {
   void getData({required String tanggal}) async {
     String token = await getToken();
     var response = await http.get(
-      Uri.parse(
-        tanggal == ''
-            ? baseURL + "/api/fg/stock/chart"
-            : baseURL + "/api/fg/stock/chart?date=$tanggal",
-      ),
+      Uri.parse(tanggal == ''
+          ? baseURL + "/api/fg/stock/chart"
+          : baseURL + "/api/fg/stock/chart?date=$tanggal"),
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
         'Authorization': 'Bearer $token'
@@ -64,6 +62,7 @@ class _StockFGState extends State<StockFG> {
       setState(() {
         tabelStockList = response.data as List<dynamic>;
         _loading = _loading ? !_loading : _loading;
+        print(tabelStockList);
       });
     } else if (response.error == unauthorized) {
       logout().then((value) => {
@@ -191,6 +190,7 @@ class _StockFGState extends State<StockFG> {
   @override
   void initState() {
     super.initState();
+    // tanggal.text = datenow;
     getData(tanggal: '');
     pilihSupplier = 'HPP';
     fungsigetTabelStockOpnameFg(
@@ -198,7 +198,7 @@ class _StockFGState extends State<StockFG> {
     // getSuplier();
     getPaginasi(supplier: pilihSupplier.toString());
 
-    tanggal.text = datenow;
+    // tanggal.text = datenow;
   }
 
   @override
@@ -280,7 +280,7 @@ class _StockFGState extends State<StockFG> {
                                         ),
                                         Text(
                                           tanggal.text == ''
-                                              ? 'dd/mm/yyy'
+                                              ? 'yyyy-MM-dd'
                                               : tanggal.text,
                                           style: TextStyle(
                                             color: black2Color,
