@@ -36,16 +36,16 @@ class _SumNGPartState extends State<SumNGPart> {
   @override
   void initState() {
     super.initState();
-    // tanggal.text = '2022-11-06';
-    tanggal.text = datenow;
+
+    // tanggal.text = datenow;
     _dataSngp = [];
     _getDataSngp();
   }
 
   _getDataSngp() async {
-    // String token = await getToken();
-    String token =
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmlzcCI6ImFkbWluIiwicm9sZV9pZCI6MSwiaWF0IjoxNjcxNjM4ODk3LCJleHAiOjE2NzE2Njc2OTd9.KRzWWvHTJPJJ39o-mW3hQQp-eokbv3Itx5utlTPxHLE";
+    String token = await getToken();
+    // String token =
+    //     "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmlzcCI6ImFkbWluIiwicm9sZV9pZCI6MSwiaWF0IjoxNjcxNjM4ODk3LCJleHAiOjE2NzE2Njc2OTd9.KRzWWvHTJPJJ39o-mW3hQQp-eokbv3Itx5utlTPxHLE";
     _dataSngp = await ServiceSngp.getDataSngp(date: tanggal.text);
     if (mounted) {
       setState(() {

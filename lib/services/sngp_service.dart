@@ -11,20 +11,30 @@ class ServiceSngp {
   static const _baseUrl = baseURL + '/api/summary/ng';
   static Future<List<StockNGModel>> getDataSngp({required String date}) async {
     String token = await getToken();
-    // "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmlzcCI6ImFkbWluIiwicm9sZV9pZCI6MSwiaWF0IjoxNjcxNjM4ODk3LCJleHAiOjE2NzE2Njc2OTd9.KRzWWvHTJPJJ39o-mW3hQQp-eokbv3Itx5utlTPxHLE";
+
     final response = await http.get(
-      Uri.parse(_baseUrl + '/date/' + date),
+      // final response = await http.get(
+      Uri.parse(date == '' ? _baseUrl : _baseUrl + '/date/' + date),
       headers: {
         HttpHeaders.contentTypeHeader: 'aplication/json',
         'Authorization': 'Bearer $token',
       },
+      // Uri.parse(_baseUrl + '/date/' + date),
+      // headers: {
+      //   HttpHeaders.contentTypeHeader: 'aplication/json',
+      //   'Authorization': 'Bearer $token',
+      // },
     );
     print(response.body);
     if (response.statusCode == 200) {
       // If the server did return a 200 OK response,
       // then parse the JSON.
       var jsonObject = jsonDecode(response.body);
-      List data = (jsonObject as Map<String, dynamic>)["list"];
+      // List data = (jsonObject as Map<String, dynamic>)["list"];
+      List data = (date == '')
+          ? (jsonObject as Map<String, dynamic>)["list"]["data"]
+          : (jsonObject as Map<String, dynamic>)["list"];
+
       List<StockNGModel> dataSngp = [];
       dataSngp = stockModelNGFromJson(data);
 
